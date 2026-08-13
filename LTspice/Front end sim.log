@@ -1,0 +1,21 @@
+LTspice 26.0.1 for Windows
+Circuit: C:\Users\dsha295\OneDrive - The University of Auckland\Documents\GitHub\209-group-15\LTspice\Front end sim.net
+Start Time: Thu Aug 13 18:47:44 2026
+solver = Normal
+Maximum thread count: 24
+tnom = 27
+temp = 27
+method = trap
+Early termination of direct N-R iteration.
+Direct Newton iteration failed to find operating point.
+Starting Gmin stepping
+Gmin stepping succeeded in finding the operating point.
+
+Total elapsed time: 0.917 seconds.
+
+Files loaded:
+C:\Users\dsha295\OneDrive - The University of Auckland\Documents\GitHub\209-group-15\LTspice\Front end sim.net
+C:\Users\dsha295\AppData\Local\LTspice\lib\cmp\standard.dio
+C:\Users\dsha295\OneDrive - The University of Auckland\Documents\GitHub\209-group-15\LTspice\LM324.lib
+C:\Users\dsha295\AppData\Local\LTspice\lib\sub\LT1083.lib
+
