@@ -11,12 +11,15 @@
 
 #include <avr/io.h>
 #include <stdint.h>
+#include <string.h>
+#include <stdio.h>
 
-#define BAUD 9600
-#define MYUBRR ((F_CPU / (16UL * BAUD)) - 1)
 
 // Function prototypes
 void uart_init(uint16_t ubrr);
 void uart_transmit(uint8_t data);
+void transmit_voltage_message(float voltage);
+void uart_transmit_string(char* message);
+
 
 #endif /* UART_H_ */
