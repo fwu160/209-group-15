@@ -13,8 +13,6 @@
 #define   PeakCurrent    125
 #define   Power          1.60
 
-
-
 #include <avr/io.h>
 #include <stdint.h>
 #include <util/delay.h>
@@ -22,16 +20,16 @@
 
 
 
-
-
-
 int main(void)
 {
-	uart_init(UBRR); 
+	uart_init(UBRR); // Initiate uart 
     while (1) 
     {
-		transmit_voltage_message(RMSVoltage); 
-		_delay_ms(1000); 
+		transmit_voltage_message(RMSVoltage);  // Send voltage message across uart
+		transmit_current_message(PeakCurrent); // Send current message across uart
+		transmit_power_message(Power);         // Send power message across uart
+		uart_transmit(13);	// New line 
+		_delay_ms(1000);	// Wait a second before looping back to send messages
     }
 }
 

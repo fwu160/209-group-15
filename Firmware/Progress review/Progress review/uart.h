@@ -19,7 +19,10 @@
 void uart_init(uint16_t ubrr);
 void uart_transmit(uint8_t data);
 void transmit_voltage_message(float voltage);
+void transmit_current_message(float current);
+void transmit_power_message(float power);
 void uart_transmit_string(char* message);
+
 
 
 #endif /* UART_H_ */
