@@ -17,7 +17,7 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   6 .debug_abbrev 000007cc  00000000  00000000  000011ba  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_line   00000445  00000000  00000000  00001986  2**0
+  7 .debug_line   00000444  00000000  00000000  00001986  2**0
                   CONTENTS, READONLY, DEBUGGING
   8 .debug_frame  00000118  00000000  00000000  00001dcc  2**2
                   CONTENTS, READONLY, DEBUGGING
@@ -95,7 +95,7 @@ int main(void)
   98:	90 e0       	ldi	r25, 0x00	; 0
   9a:	0e 94 6e 00 	call	0xdc	; 0xdc <uart_init>
     while (1) 
-    {
+    {	
 		transmit_voltage_message(RMSVoltage);  // Send voltage message across uart
   9e:	60 e0       	ldi	r22, 0x00	; 0
   a0:	70 e0       	ldi	r23, 0x00	; 0
@@ -114,8 +114,9 @@ int main(void)
   ba:	8c ec       	ldi	r24, 0xCC	; 204
   bc:	9f e3       	ldi	r25, 0x3F	; 63
   be:	0e 94 1f 01 	call	0x23e	; 0x23e <transmit_power_message>
-		uart_transmit(13);	// New line 
-  c2:	8d e0       	ldi	r24, 0x0D	; 13
+		
+		uart_transmit('\n'); // Line feed
+  c2:	8a e0       	ldi	r24, 0x0A	; 10
   c4:	0e 94 7d 00 	call	0xfa	; 0xfa <uart_transmit>
 	#else
 		//round up by default
@@ -138,7 +139,7 @@ int main(void)
 
 #include "uart.h"
 
-// Configures the UART to 9600 baud (at F_CPU=2MHz), 8 data bits, 1 stop bit, no parity (8N1)
+// Configures the UART baud rate (via ubrr), 8 data bits, 1 stop bit, no parity (8N1)
 void uart_init(uint16_t ubrr) {
 	UBRR0 = ubrr; 
   dc:	90 93 c5 00 	sts	0x00C5, r25	; 0x8000c5 <__TEXT_REGION_LENGTH__+0x7f80c5>
@@ -152,7 +153,7 @@ void uart_init(uint16_t ubrr) {
   ec:	80 81       	ld	r24, Z
   ee:	88 60       	ori	r24, 0x08	; 8
   f0:	80 83       	st	Z, r24
-	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);	// Frame format: Async, No Parity, 1 Stop Bit, 8 Data Bits (technically 11 for 8bit is default, so don't need to set)
+	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);	// Frame format: Async, No Parity, 1 Stop Bit, 8 Data Bits (UCSZ02 in UCSR0B defaults to 0)
   f2:	86 e0       	ldi	r24, 0x06	; 6
   f4:	80 93 c2 00 	sts	0x00C2, r24	; 0x8000c2 <__TEXT_REGION_LENGTH__+0x7f80c2>
   f8:	08 95       	ret
@@ -176,29 +177,25 @@ void uart_transmit(uint8_t data) {
 00000108 <uart_transmit_string>:
 }
 
-// Function turns a char array into their respective ascii values and transmits the array
+// Function iterates through a string array using pointer and sends it via uart 
 void uart_transmit_string(char* message){
  108:	0f 93       	push	r16
  10a:	1f 93       	push	r17
  10c:	cf 93       	push	r28
  10e:	df 93       	push	r29
  110:	8c 01       	movw	r16, r24
-	// Loops through each value in array and transmits it
-	for (int i = 0; i<strlen(string_buffer); i++){
-		uart_transmit(string_buffer[i]);
-	}
-	*/
+	// Loops through string array until null terminator is reached. 
 	for (int i = 0; message[i] != '\0'; i++) {
  112:	c0 e0       	ldi	r28, 0x00	; 0
  114:	d0 e0       	ldi	r29, 0x00	; 0
  116:	03 c0       	rjmp	.+6      	; 0x11e <uart_transmit_string+0x16>
 		uart_transmit(message[i]);
  118:	0e 94 7d 00 	call	0xfa	; 0xfa <uart_transmit>
-	// Loops through each value in array and transmits it
-	for (int i = 0; i<strlen(string_buffer); i++){
-		uart_transmit(string_buffer[i]);
-	}
-	*/
+}
+
+// Function iterates through a string array using pointer and sends it via uart 
+void uart_transmit_string(char* message){
+	// Loops through string array until null terminator is reached. 
 	for (int i = 0; message[i] != '\0'; i++) {
  11c:	21 96       	adiw	r28, 0x01	; 1
  11e:	f8 01       	movw	r30, r16

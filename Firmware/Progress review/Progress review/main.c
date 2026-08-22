@@ -24,11 +24,13 @@ int main(void)
 {
 	uart_init(UBRR); // Initiate uart 
     while (1) 
-    {
+    {	
 		transmit_voltage_message(RMSVoltage);  // Send voltage message across uart
 		transmit_current_message(PeakCurrent); // Send current message across uart
 		transmit_power_message(Power);         // Send power message across uart
-		uart_transmit(13);	// New line 
+		
+		uart_transmit('\n'); // Line feed
+		
 		_delay_ms(1000);	// Wait a second before looping back to send messages
     }
 }
