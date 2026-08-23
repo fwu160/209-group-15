@@ -1,6 +1,6 @@
 LTspice 26.0.2 for Windows
 Circuit: C:\Users\hiimf\OneDrive\Documents\GitHub\209-group-15\LTspice\Front end sim.net
-Start Time: Sun Aug 23 00:34:58 2026
+Start Time: Sun Aug 23 18:01:19 2026
 solver = Normal
 Maximum thread count: 12
 tnom = 27
@@ -9,9 +9,11 @@ method = trap
 Early termination of direct N-R iteration.
 Direct Newton iteration failed to find operating point.
 Starting Gmin stepping
-Gmin stepping succeeded in finding the operating point.
+Gmin stepping failed to find operating point. Use".option gminsteps=0" to skip all Gmin stepping.
+Starting source stepping with srcstepmethod=0
+Source stepping succeeded in finding the operating point.
 
-Total elapsed time: 10.513 seconds.
+Total elapsed time: 3.673 seconds.
 
 Files loaded:
 C:\Users\hiimf\OneDrive\Documents\GitHub\209-group-15\LTspice\Front end sim.net
