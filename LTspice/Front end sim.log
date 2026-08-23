@@ -1,6 +1,6 @@
 LTspice 26.0.2 for Windows
 Circuit: C:\Users\hiimf\OneDrive\Documents\GitHub\209-group-15\LTspice\Front end sim.net
-Start Time: Sun Aug 23 18:01:19 2026
+Start Time: Sun Aug 23 21:10:13 2026
 solver = Normal
 Maximum thread count: 12
 tnom = 27
@@ -13,7 +13,7 @@ Gmin stepping failed to find operating point. Use".option gminsteps=0" to skip a
 Starting source stepping with srcstepmethod=0
 Source stepping succeeded in finding the operating point.
 
-Total elapsed time: 3.673 seconds.
+Total elapsed time: 1.299 seconds.
 
 Files loaded:
 C:\Users\hiimf\OneDrive\Documents\GitHub\209-group-15\LTspice\Front end sim.net
