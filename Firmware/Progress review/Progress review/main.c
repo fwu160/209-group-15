@@ -30,7 +30,7 @@ int main(void)
 		transmit_power_message(Power);         // Send power message across uart
 		
 		uart_transmit('\n'); // Line feed
-		uart_transmit('\r')  // Carriage return
+		uart_transmit('\r');  // Carriage return
 		
 		_delay_ms(1000);	// Wait a second before looping back to send messages
     }
