@@ -89,3 +89,32 @@ void transmit_power_message(float power){
 
 }
 
+// Sends "voltage,current,power\n" - the compact format the ESP32 bridge parses.
+// Different from the transmit_*_message functions above, which build the
+// human-readable text meant for a terminal, not for the ESP link.
+void transmit_uart_frame(float voltage, float current, float power) {
+	int8_t offset = 48;
+
+	// Voltage: XX.X
+	uart_transmit((((int)voltage / 10) % 10) + offset);
+	uart_transmit((((int)voltage) % 10) + offset);
+	uart_transmit('.');
+	uart_transmit((((int)(voltage * 10)) % 10) + offset);
+
+	uart_transmit(',');
+
+	// Current: XXX (already in mA, integer, no decimal point)
+	uart_transmit((((int)current / 100) % 10) + offset);
+	uart_transmit((((int)current / 10) % 10) + offset);
+	uart_transmit((((int)current) % 10) + offset);
+
+	uart_transmit(',');
+
+	// Power: X.XX
+	uart_transmit((((int)power) % 10) + offset);
+	uart_transmit('.');
+	uart_transmit((((int)(power * 10)) % 10) + offset);
+	uart_transmit((((int)(power * 100)) % 10) + offset);
+
+	uart_transmit('\n');
+}

@@ -22,6 +22,8 @@ void transmit_voltage_message(float voltage);
 void transmit_current_message(float current);
 void transmit_power_message(float power);
 void uart_transmit_string(char* message);
+void transmit_uart_frame(float voltage, float current, float power);
+
 
 
 

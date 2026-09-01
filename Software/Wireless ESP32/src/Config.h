@@ -14,5 +14,6 @@ namespace Config {
   // UART link to the ATmega328P. Baud rate must match its USART setting.
   constexpr unsigned long ATMEGA_BAUD = 9600;
   constexpr int ATMEGA_RX_PIN = 16;   // ESP RX2 <- ATmega TXD (through voltage divider)
+  constexpr int ATMEGA_TX_PIN = 17;   // NOT USED
 
 }

@@ -15,9 +15,9 @@ TelemetryServer telemetryServer;
 
 // Prints a reading out the USB port in the required format
 void printReadingOverUsb(const Reading& r) {
-  Serial.printf("RMS Voltage is: %.1f\n", r.voltage);
-  Serial.printf("Peak Current is: %.0f\n", r.current);
-  Serial.printf("Power is: %.2f\n", r.power);
+  Serial.printf("RMS Voltage is: %.1f\r\n", r.voltage);
+  Serial.printf("Peak Current is: %.0f\r\n", r.current);
+  Serial.printf("Power is: %.2f\r\n", r.power);
   Serial.println(); // Blank line before the next block
 }
 
