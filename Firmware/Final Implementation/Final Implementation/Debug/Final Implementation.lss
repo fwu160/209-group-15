@@ -3,38 +3,38 @@ Final Implementation.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000000  00800100  00800100  00000570  2**0
+  0 .data         00000000  00800100  00800100  000003ca  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         000004fc  00000000  00000000  00000074  2**1
+  1 .text         00000356  00000000  00000000  00000074  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000001  00800100  00800100  00000570  2**0
+  2 .bss          00000328  00800100  00800100  000003ca  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  00000570  2**0
+  3 .comment      00000030  00000000  00000000  000003ca  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000005a0  2**2
+  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000003fc  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 000000d8  00000000  00000000  000005e0  2**0
+  5 .debug_aranges 000000f8  00000000  00000000  0000043c  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   00000dcf  00000000  00000000  000006b8  2**0
+  6 .debug_info   00000d2c  00000000  00000000  00000534  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 000008e6  00000000  00000000  00001487  2**0
+  7 .debug_abbrev 0000095c  00000000  00000000  00001260  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   000006ce  00000000  00000000  00001d6d  2**0
+  8 .debug_line   0000074c  00000000  00000000  00001bbc  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  00000258  00000000  00000000  0000243c  2**2
+  9 .debug_frame  000001ec  00000000  00000000  00002308  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000509  00000000  00000000  00002694  2**0
+ 10 .debug_str    0000053b  00000000  00000000  000024f4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000587  00000000  00000000  00002b9d  2**0
+ 11 .debug_loc    000002f3  00000000  00000000  00002a2f  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000098  00000000  00000000  00003124  2**0
+ 12 .debug_ranges 000000a8  00000000  00000000  00002d22  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
 
 00000000 <__vectors>:
    0:	0c 94 34 00 	jmp	0x68	; 0x68 <__ctors_end>
-   4:	0c 94 36 01 	jmp	0x26c	; 0x26c <__vector_1>
+   4:	0c 94 7f 01 	jmp	0x2fe	; 0x2fe <__vector_1>
    8:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
    c:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
   10:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
@@ -54,7 +54,7 @@ Disassembly of section .text:
   48:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
   4c:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
   50:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
-  54:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
+  54:	0c 94 9d 00 	jmp	0x13a	; 0x13a <__vector_21>
   58:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
   5c:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
   60:	0c 94 51 00 	jmp	0xa2	; 0xa2 <__bad_interrupt>
@@ -72,8 +72,8 @@ Disassembly of section .text:
   74:	11 e0       	ldi	r17, 0x01	; 1
   76:	a0 e0       	ldi	r26, 0x00	; 0
   78:	b1 e0       	ldi	r27, 0x01	; 1
-  7a:	ec ef       	ldi	r30, 0xFC	; 252
-  7c:	f4 e0       	ldi	r31, 0x04	; 4
+  7a:	e6 e5       	ldi	r30, 0x56	; 86
+  7c:	f3 e0       	ldi	r31, 0x03	; 3
   7e:	02 c0       	rjmp	.+4      	; 0x84 <__do_copy_data+0x10>
   80:	05 90       	lpm	r0, Z+
   82:	0d 92       	st	X+, r0
@@ -82,7 +82,7 @@ Disassembly of section .text:
   88:	d9 f7       	brne	.-10     	; 0x80 <__do_copy_data+0xc>
 
 0000008a <__do_clear_bss>:
-  8a:	21 e0       	ldi	r18, 0x01	; 1
+  8a:	24 e0       	ldi	r18, 0x04	; 4
   8c:	a0 e0       	ldi	r26, 0x00	; 0
   8e:	b1 e0       	ldi	r27, 0x01	; 1
   90:	01 c0       	rjmp	.+2      	; 0x94 <.do_clear_bss_start>
@@ -91,636 +91,564 @@ Disassembly of section .text:
   92:	1d 92       	st	X+, r1
 
 00000094 <.do_clear_bss_start>:
-  94:	a1 30       	cpi	r26, 0x01	; 1
+  94:	a8 32       	cpi	r26, 0x28	; 40
   96:	b2 07       	cpc	r27, r18
   98:	e1 f7       	brne	.-8      	; 0x92 <.do_clear_bss_loop>
-  9a:	0e 94 53 00 	call	0xa6	; 0xa6 <main>
-  9e:	0c 94 7c 02 	jmp	0x4f8	; 0x4f8 <_exit>
+  9a:	0e 94 16 01 	call	0x22c	; 0x22c <main>
+  9e:	0c 94 a9 01 	jmp	0x352	; 0x352 <_exit>
 
 000000a2 <__bad_interrupt>:
   a2:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
 
-000000a6 <main>:
+000000a6 <adc_init>:
+// flag to tell whatever function that is using adc that the burst capture is done 
+static volatile uint8_t   capture_done_flag;
 
+void adc_init(void)
+{
+	ADMUX =0;				// clear all mux bits to 0 
+  a6:	ec e7       	ldi	r30, 0x7C	; 124
+  a8:	f0 e0       	ldi	r31, 0x00	; 0
+  aa:	10 82       	st	Z, r1
+	ADMUX |= (1<<REFS0);	// Vref to 5V Vcc
+  ac:	80 81       	ld	r24, Z
+  ae:	80 64       	ori	r24, 0x40	; 64
+  b0:	80 83       	st	Z, r24
+	ADCSRA |= (1<<ADPS1)|(1<<ADPS0);	// set to prescaler of 8, should get 125kHz from 2Mhz CPU clk
+  b2:	ea e7       	ldi	r30, 0x7A	; 122
+  b4:	f0 e0       	ldi	r31, 0x00	; 0
+  b6:	80 81       	ld	r24, Z
+  b8:	83 60       	ori	r24, 0x03	; 3
+  ba:	80 83       	st	Z, r24
+	ADCSRA |= (1<<ADEN);	// enable adc peripheral
+  bc:	80 81       	ld	r24, Z
+  be:	80 68       	ori	r24, 0x80	; 128
+  c0:	80 83       	st	Z, r24
+	ADCSRA |= (1<<ADSC);	// do a dummy coversion to warm up peripheral  
+  c2:	80 81       	ld	r24, Z
+  c4:	80 64       	ori	r24, 0x40	; 64
+  c6:	80 83       	st	Z, r24
+  c8:	08 95       	ret
 
+000000ca <adc_select_channel>:
+	
+}
+
+void adc_select_channel(uint8_t channel)
+{
+	ADMUX &= ~((1<<MUX3)|(1<<MUX2)|(1<<MUX1)|(1<<MUX0)); // clear all mux bits to 0000, ready for update 
+  ca:	ec e7       	ldi	r30, 0x7C	; 124
+  cc:	f0 e0       	ldi	r31, 0x00	; 0
+  ce:	90 81       	ld	r25, Z
+  d0:	90 7f       	andi	r25, 0xF0	; 240
+  d2:	90 83       	st	Z, r25
+	ADMUX |= (channel & 0x0F);	// select new channel, use mask to make sure only 4 right bits are being changed eg 0010 & 00001111 <= mask will become 00000010
+  d4:	90 81       	ld	r25, Z
+  d6:	8f 70       	andi	r24, 0x0F	; 15
+  d8:	98 2b       	or	r25, r24
+  da:	90 83       	st	Z, r25
+
+	ADCSRA |= (1 << ADSC);       // one ordinary blocking conversion to start up the adc peripheral 
+  dc:	ea e7       	ldi	r30, 0x7A	; 122
+  de:	f0 e0       	ldi	r31, 0x00	; 0
+  e0:	80 81       	ld	r24, Z
+  e2:	80 64       	ori	r24, 0x40	; 64
+  e4:	80 83       	st	Z, r24
+	
+	// loop to make sure conversion finishes before anything else uses adc 
+	while(ADCSRA & (1<<ADSC)){
+  e6:	80 91 7a 00 	lds	r24, 0x007A	; 0x80007a <__TEXT_REGION_LENGTH__+0x7f807a>
+  ea:	86 fd       	sbrc	r24, 6
+  ec:	fc cf       	rjmp	.-8      	; 0xe6 <adc_select_channel+0x1c>
+		; // wait 
+	}
+	
+}
+  ee:	08 95       	ret
+
+000000f0 <adc_start_capture>:
+
+// Tells the ADC where to store the next n triggered samples and arms auto-triggering + the ADC interrupt.
+void adc_start_capture(volatile uint16_t *buffer, uint16_t n)
+{
+	// this is done so that the ISR can access the variables passed into adc_start_capture 
+	capture_buffer = buffer;
+  f0:	90 93 06 01 	sts	0x0106, r25	; 0x800106 <capture_buffer+0x1>
+  f4:	80 93 05 01 	sts	0x0105, r24	; 0x800105 <capture_buffer>
+	capture_n = n;
+  f8:	70 93 04 01 	sts	0x0104, r23	; 0x800104 <capture_n+0x1>
+  fc:	60 93 03 01 	sts	0x0103, r22	; 0x800103 <capture_n>
+	capture_index = 0;
+ 100:	10 92 02 01 	sts	0x0102, r1	; 0x800102 <capture_index+0x1>
+ 104:	10 92 01 01 	sts	0x0101, r1	; 0x800101 <capture_index>
+	capture_done_flag = 0;
+ 108:	10 92 00 01 	sts	0x0100, r1	; 0x800100 <__DATA_REGION_ORIGIN__>
+
+	// ADTS bits = 101 , Timer/Counter1 Compare Match B is the trigger source
+	ADCSRB = (ADCSRB & 0xF8) | (1 << ADTS2) | (0 << ADTS1) | (1 << ADTS0);
+ 10c:	eb e7       	ldi	r30, 0x7B	; 123
+ 10e:	f0 e0       	ldi	r31, 0x00	; 0
+ 110:	80 81       	ld	r24, Z
+ 112:	88 7f       	andi	r24, 0xF8	; 248
+ 114:	85 60       	ori	r24, 0x05	; 5
+ 116:	80 83       	st	Z, r24
+	TIFR1  = (1 << OCF1B);   // clear any leftover/stale flag in timer1 flag reg before the first real trigger
+ 118:	84 e0       	ldi	r24, 0x04	; 4
+ 11a:	86 bb       	out	0x16, r24	; 22
+	// enable auto trigger, enable adc completed interrupt  
+	ADCSRA |= (1 << ADATE) | (1 << ADIE);
+ 11c:	ea e7       	ldi	r30, 0x7A	; 122
+ 11e:	f0 e0       	ldi	r31, 0x00	; 0
+ 120:	80 81       	ld	r24, Z
+ 122:	88 62       	ori	r24, 0x28	; 40
+ 124:	80 83       	st	Z, r24
+ 126:	08 95       	ret
+
+00000128 <adc_capture_done>:
+}
+
+// return adc burst capture done flag to whatever function is using burst capture 
+uint8_t adc_capture_done(void) { 
+	return capture_done_flag; 
+ 128:	80 91 00 01 	lds	r24, 0x0100	; 0x800100 <__DATA_REGION_ORIGIN__>
+
+}
+ 12c:	08 95       	ret
+
+0000012e <adc_stop>:
+
+// stop all ADC interrupts, isnt triggered by timer1 anymore
+void adc_stop(void)
+{
+	ADCSRA &= (uint8_t)~((1 << ADATE) | (1 << ADIE));
+ 12e:	ea e7       	ldi	r30, 0x7A	; 122
+ 130:	f0 e0       	ldi	r31, 0x00	; 0
+ 132:	80 81       	ld	r24, Z
+ 134:	87 7d       	andi	r24, 0xD7	; 215
+ 136:	80 83       	st	Z, r24
+ 138:	08 95       	ret
+
+0000013a <__vector_21>:
+}
+
+ISR(ADC_vect)
+{
+ 13a:	1f 92       	push	r1
+ 13c:	0f 92       	push	r0
+ 13e:	0f b6       	in	r0, 0x3f	; 63
+ 140:	0f 92       	push	r0
+ 142:	11 24       	eor	r1, r1
+ 144:	2f 93       	push	r18
+ 146:	3f 93       	push	r19
+ 148:	8f 93       	push	r24
+ 14a:	9f 93       	push	r25
+ 14c:	ef 93       	push	r30
+ 14e:	ff 93       	push	r31
+	// Must be cleared every sample, or the ADC stops seeing the NEXT Timer1 compare match as a fresh trigger edge 
+	// no Timer1 interrupts set so thats why we need to manually clear it every time with = (NOT |= since in datasheet it says set 1 to clear so using |= could acidentally clear other flags in reg)
+	TIFR1 = (1 << OCF1B);
+ 150:	84 e0       	ldi	r24, 0x04	; 4
+ 152:	86 bb       	out	0x16, r24	; 22
+	
+	// stores ADC value in given capture array 
+	capture_buffer[capture_index] = ADC;
+ 154:	e0 91 01 01 	lds	r30, 0x0101	; 0x800101 <capture_index>
+ 158:	f0 91 02 01 	lds	r31, 0x0102	; 0x800102 <capture_index+0x1>
+ 15c:	ee 0f       	add	r30, r30
+ 15e:	ff 1f       	adc	r31, r31
+ 160:	80 91 05 01 	lds	r24, 0x0105	; 0x800105 <capture_buffer>
+ 164:	90 91 06 01 	lds	r25, 0x0106	; 0x800106 <capture_buffer+0x1>
+ 168:	e8 0f       	add	r30, r24
+ 16a:	f9 1f       	adc	r31, r25
+ 16c:	80 91 78 00 	lds	r24, 0x0078	; 0x800078 <__TEXT_REGION_LENGTH__+0x7f8078>
+ 170:	90 91 79 00 	lds	r25, 0x0079	; 0x800079 <__TEXT_REGION_LENGTH__+0x7f8079>
+ 174:	91 83       	std	Z+1, r25	; 0x01
+ 176:	80 83       	st	Z, r24
+	capture_index++;
+ 178:	80 91 01 01 	lds	r24, 0x0101	; 0x800101 <capture_index>
+ 17c:	90 91 02 01 	lds	r25, 0x0102	; 0x800102 <capture_index+0x1>
+ 180:	01 96       	adiw	r24, 0x01	; 1
+ 182:	90 93 02 01 	sts	0x0102, r25	; 0x800102 <capture_index+0x1>
+ 186:	80 93 01 01 	sts	0x0101, r24	; 0x800101 <capture_index>
+
+	// If capture index reaches given array size, stop adding and set the capture done flag to 1 to let function know burst capture is done
+	if (capture_index >= capture_n) {
+ 18a:	20 91 01 01 	lds	r18, 0x0101	; 0x800101 <capture_index>
+ 18e:	30 91 02 01 	lds	r19, 0x0102	; 0x800102 <capture_index+0x1>
+ 192:	80 91 03 01 	lds	r24, 0x0103	; 0x800103 <capture_n>
+ 196:	90 91 04 01 	lds	r25, 0x0104	; 0x800104 <capture_n+0x1>
+ 19a:	28 17       	cp	r18, r24
+ 19c:	39 07       	cpc	r19, r25
+ 19e:	18 f0       	brcs	.+6      	; 0x1a6 <__vector_21+0x6c>
+		capture_done_flag = 1;
+ 1a0:	81 e0       	ldi	r24, 0x01	; 1
+ 1a2:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
+	}
+}
+ 1a6:	ff 91       	pop	r31
+ 1a8:	ef 91       	pop	r30
+ 1aa:	9f 91       	pop	r25
+ 1ac:	8f 91       	pop	r24
+ 1ae:	3f 91       	pop	r19
+ 1b0:	2f 91       	pop	r18
+ 1b2:	0f 90       	pop	r0
+ 1b4:	0f be       	out	0x3f, r0	; 63
+ 1b6:	0f 90       	pop	r0
+ 1b8:	1f 90       	pop	r1
+ 1ba:	18 95       	reti
+
+000001bc <capture_one_burst>:
+#include "adc.h"
+#include "zerocross.h"
+
+// One burst on one channel, will be used to capture V and I signals from the same relative point (rising zero crossing on V signal)
+static uint8_t capture_one_burst(volatile uint16_t *buffer, uint8_t channel)
+{
+ 1bc:	cf 93       	push	r28
+ 1be:	df 93       	push	r29
+ 1c0:	ec 01       	movw	r28, r24
+ 1c2:	86 2f       	mov	r24, r22
+	adc_select_channel(channel);      
+ 1c4:	0e 94 65 00 	call	0xca	; 0xca <adc_select_channel>
+	timer1_reset();
+ 1c8:	0e 94 53 01 	call	0x2a6	; 0x2a6 <timer1_reset>
+	adc_start_capture(buffer, N_SAMPLES);  // start adc capture
+ 1cc:	68 ec       	ldi	r22, 0xC8	; 200
+ 1ce:	70 e0       	ldi	r23, 0x00	; 0
+ 1d0:	ce 01       	movw	r24, r28
+ 1d2:	0e 94 78 00 	call	0xf0	; 0xf0 <adc_start_capture>
+
+	if (!zc_wait_for_edge()) {          // real INT0 interrupt underneath; timer1_start()
+ 1d6:	0e 94 66 01 	call	0x2cc	; 0x2cc <zc_wait_for_edge>
+ 1da:	c8 2f       	mov	r28, r24
+ 1dc:	81 11       	cpse	r24, r1
+ 1de:	03 c0       	rjmp	.+6      	; 0x1e6 <capture_one_burst+0x2a>
+		adc_stop();                     // already happened inside that ISR if it succeeded
+ 1e0:	0e 94 97 00 	call	0x12e	; 0x12e <adc_stop>
+		return 0;
+ 1e4:	09 c0       	rjmp	.+18     	; 0x1f8 <capture_one_burst+0x3c>
+	}
+	// block loop here to wait for adc burst to finish, might need to remove if main would need to do something 
+	// but burst capture should have number 1 priorty as accuracy is most important 
+	while (!adc_capture_done()) {
+ 1e6:	0e 94 94 00 	call	0x128	; 0x128 <adc_capture_done>
+ 1ea:	88 23       	and	r24, r24
+ 1ec:	e1 f3       	breq	.-8      	; 0x1e6 <capture_one_burst+0x2a>
+		;
+	}
+
+	timer1_stop();
+ 1ee:	0e 94 4d 01 	call	0x29a	; 0x29a <timer1_stop>
+	adc_stop();
+ 1f2:	0e 94 97 00 	call	0x12e	; 0x12e <adc_stop>
+	return 1;
+ 1f6:	c1 e0       	ldi	r28, 0x01	; 1
+}
+ 1f8:	8c 2f       	mov	r24, r28
+ 1fa:	df 91       	pop	r29
+ 1fc:	cf 91       	pop	r28
+ 1fe:	08 95       	ret
+
+00000200 <capture_phase_locked>:
+
+capture_result_t capture_phase_locked(volatile uint16_t *v_buffer, volatile uint16_t *i_buffer)
+{
+ 200:	cf 93       	push	r28
+ 202:	df 93       	push	r29
+ 204:	eb 01       	movw	r28, r22
+	// if capture_one_burst for v fails it returns 0, then return CAPTURE_ERR_NO_ZC_V error code
+	if (!capture_one_burst(v_buffer, ADC_CHANNEL_V)) {
+ 206:	60 e0       	ldi	r22, 0x00	; 0
+ 208:	0e 94 de 00 	call	0x1bc	; 0x1bc <capture_one_burst>
+ 20c:	88 23       	and	r24, r24
+ 20e:	41 f0       	breq	.+16     	; 0x220 <capture_phase_locked+0x20>
+		return CAPTURE_ERR_NO_ZC_V;
+	}
+	
+	// if capture_one_burst for i fails it returns 0, then return CAPTURE_ERR_NO_ZC_I error code
+
+	if (!capture_one_burst(i_buffer, ADC_CHANNEL_I)) {
+ 210:	61 e0       	ldi	r22, 0x01	; 1
+ 212:	ce 01       	movw	r24, r28
+ 214:	0e 94 de 00 	call	0x1bc	; 0x1bc <capture_one_burst>
+ 218:	81 11       	cpse	r24, r1
+ 21a:	04 c0       	rjmp	.+8      	; 0x224 <capture_phase_locked+0x24>
+		return CAPTURE_ERR_NO_ZC_I;
+ 21c:	82 e0       	ldi	r24, 0x02	; 2
+ 21e:	03 c0       	rjmp	.+6      	; 0x226 <capture_phase_locked+0x26>
+
+capture_result_t capture_phase_locked(volatile uint16_t *v_buffer, volatile uint16_t *i_buffer)
+{
+	// if capture_one_burst for v fails it returns 0, then return CAPTURE_ERR_NO_ZC_V error code
+	if (!capture_one_burst(v_buffer, ADC_CHANNEL_V)) {
+		return CAPTURE_ERR_NO_ZC_V;
+ 220:	81 e0       	ldi	r24, 0x01	; 1
+ 222:	01 c0       	rjmp	.+2      	; 0x226 <capture_phase_locked+0x26>
+	if (!capture_one_burst(i_buffer, ADC_CHANNEL_I)) {
+		return CAPTURE_ERR_NO_ZC_I;
+	}
+	
+	
+	return CAPTURE_OK;
+ 224:	80 e0       	ldi	r24, 0x00	; 0
+ 226:	df 91       	pop	r29
+ 228:	cf 91       	pop	r28
+ 22a:	08 95       	ret
+
+0000022c <main>:
+static uint16_t v_buf[N_SAMPLES];
+static uint16_t i_buf[N_SAMPLES];
 
 int main(void)
 {
-	uart_init(UBRR); // Initiate uart 
-  a6:	8c e0       	ldi	r24, 0x0C	; 12
-  a8:	90 e0       	ldi	r25, 0x00	; 0
-  aa:	0e 94 77 00 	call	0xee	; 0xee <uart_init>
-    while (1) 
-    {	
+	DDRB |= (1 << 0); // pb0 is debug pin
+ 22c:	84 b1       	in	r24, 0x04	; 4
+ 22e:	81 60       	ori	r24, 0x01	; 1
+ 230:	84 b9       	out	0x04, r24	; 4
 
-		transmit_uart_frame(RMSVoltage, PeakCurrent, Power);  // sends to the ESP32
-  ae:	1d ec       	ldi	r17, 0xCD	; 205
-  b0:	e1 2e       	mov	r14, r17
-  b2:	1c ec       	ldi	r17, 0xCC	; 204
-  b4:	f1 2e       	mov	r15, r17
-  b6:	0c ec       	ldi	r16, 0xCC	; 204
-  b8:	1f e3       	ldi	r17, 0x3F	; 63
-  ba:	20 e0       	ldi	r18, 0x00	; 0
-  bc:	30 e0       	ldi	r19, 0x00	; 0
-  be:	4a ef       	ldi	r20, 0xFA	; 250
-  c0:	52 e4       	ldi	r21, 0x42	; 66
-  c2:	60 e0       	ldi	r22, 0x00	; 0
-  c4:	70 e0       	ldi	r23, 0x00	; 0
-  c6:	88 e6       	ldi	r24, 0x68	; 104
-  c8:	91 e4       	ldi	r25, 0x41	; 65
-  ca:	0e 94 8d 00 	call	0x11a	; 0x11a <transmit_uart_frame>
-	#else
-		//round up by default
-		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
-	#endif
+	
+	timer1_init();
+ 232:	0e 94 35 01 	call	0x26a	; 0x26a <timer1_init>
+	adc_init();
+ 236:	0e 94 53 00 	call	0xa6	; 0xa6 <adc_init>
+	zc_init();
+ 23a:	0e 94 5a 01 	call	0x2b4	; 0x2b4 <zc_init>
+	// uart_init(UBRR); // Initiate uart
+	sei();   // enable global interrupts once every module above is configured
+ 23e:	78 94       	sei
+	
+	
+	    while (1){	
+			
+		// enum from capture.h
+		capture_result_t result = capture_phase_locked(v_buf, i_buf);
+ 240:	67 e0       	ldi	r22, 0x07	; 7
+ 242:	71 e0       	ldi	r23, 0x01	; 1
+ 244:	87 e9       	ldi	r24, 0x97	; 151
+ 246:	92 e0       	ldi	r25, 0x02	; 2
+ 248:	0e 94 00 01 	call	0x200	; 0x200 <capture_phase_locked>
 
-	__builtin_avr_delay_cycles(__ticks_dc);
-  ce:	2f e7       	ldi	r18, 0x7F	; 127
-  d0:	8a e1       	ldi	r24, 0x1A	; 26
-  d2:	96 e0       	ldi	r25, 0x06	; 6
-  d4:	21 50       	subi	r18, 0x01	; 1
-  d6:	80 40       	sbci	r24, 0x00	; 0
-  d8:	90 40       	sbci	r25, 0x00	; 0
-  da:	e1 f7       	brne	.-8      	; 0xd4 <main+0x2e>
-  dc:	00 c0       	rjmp	.+0      	; 0xde <main+0x38>
-  de:	00 00       	nop
-  e0:	e6 cf       	rjmp	.-52     	; 0xae <main+0x8>
 
-000000e2 <timer1_start>:
+		if (result == CAPTURE_OK) {
+ 24c:	81 11       	cpse	r24, r1
+ 24e:	05 c0       	rjmp	.+10     	; 0x25a <main+0x2e>
+			// TODO once power_calc exists: power_calc_run(v_buf, i_buf, N_SAMPLES, ...)
+			
+			
+			PORTB ^= (1 << PORTB0);   // one toggle per good capture
+ 250:	95 b1       	in	r25, 0x05	; 5
+ 252:	81 e0       	ldi	r24, 0x01	; 1
+ 254:	89 27       	eor	r24, r25
+ 256:	85 b9       	out	0x05, r24	; 5
+ 258:	f3 cf       	rjmp	.-26     	; 0x240 <main+0x14>
+			} else {
+			PORTB ^= (1 << PORTB0);   // double-pulse = timed out
+ 25a:	95 b1       	in	r25, 0x05	; 5
+ 25c:	81 e0       	ldi	r24, 0x01	; 1
+ 25e:	98 27       	eor	r25, r24
+ 260:	95 b9       	out	0x05, r25	; 5
+			PORTB ^= (1 << PORTB0);
+ 262:	95 b1       	in	r25, 0x05	; 5
+ 264:	89 27       	eor	r24, r25
+ 266:	85 b9       	out	0x05, r24	; 5
+ 268:	eb cf       	rjmp	.-42     	; 0x240 <main+0x14>
+
+0000026a <timer1_init>:
+#include "timer.h"
+#include <avr/interrupt.h>
+
+// CTC mode, TOP = TIMER1_TOP, left stopped
+void timer1_init(void){
+	TCCR1B |= (1<<WGM12);	// CTC mode set WGM bits 0100
+ 26a:	e1 e8       	ldi	r30, 0x81	; 129
+ 26c:	f0 e0       	ldi	r31, 0x00	; 0
+ 26e:	80 81       	ld	r24, Z
+ 270:	88 60       	ori	r24, 0x08	; 8
+ 272:	80 83       	st	Z, r24
+	OCR1A = TIMER1_TOP;		// sets the period of the timer, TIMER1_TOP defined in common.h file 
+ 274:	87 ec       	ldi	r24, 0xC7	; 199
+ 276:	90 e0       	ldi	r25, 0x00	; 0
+ 278:	90 93 89 00 	sts	0x0089, r25	; 0x800089 <__TEXT_REGION_LENGTH__+0x7f8089>
+ 27c:	80 93 88 00 	sts	0x0088, r24	; 0x800088 <__TEXT_REGION_LENGTH__+0x7f8088>
+	OCR1B = TIMER1_TOP;		// Needed since ADC only has a Timer/Counter1 Compare Match B trigger source 
+ 280:	90 93 8b 00 	sts	0x008B, r25	; 0x80008b <__TEXT_REGION_LENGTH__+0x7f808b>
+ 284:	80 93 8a 00 	sts	0x008A, r24	; 0x80008a <__TEXT_REGION_LENGTH__+0x7f808a>
+	TIMSK1 = 0b00000000;	// no interrupts set 
+ 288:	10 92 6f 00 	sts	0x006F, r1	; 0x80006f <__TEXT_REGION_LENGTH__+0x7f806f>
+ 28c:	08 95       	ret
+
+0000028e <timer1_start>:
 }
 
 
 // function to start timer1
 void timer1_start(void){
 	TCCR1B |= (1<<CS10);	// set CS1 bits to 001, prescaler of 1 set (no prescaling)
-  e2:	e1 e8       	ldi	r30, 0x81	; 129
-  e4:	f0 e0       	ldi	r31, 0x00	; 0
-  e6:	80 81       	ld	r24, Z
-  e8:	81 60       	ori	r24, 0x01	; 1
-  ea:	80 83       	st	Z, r24
-  ec:	08 95       	ret
+ 28e:	e1 e8       	ldi	r30, 0x81	; 129
+ 290:	f0 e0       	ldi	r31, 0x00	; 0
+ 292:	80 81       	ld	r24, Z
+ 294:	81 60       	ori	r24, 0x01	; 1
+ 296:	80 83       	st	Z, r24
+ 298:	08 95       	ret
 
-000000ee <uart_init>:
-	uart_transmit((((int)(power * 100)) % 10) + offset); // 0.01ths digit (fixed formula)
+0000029a <timer1_stop>:
+}	
 
-	uart_transmit('\r');
-	uart_transmit('\n');
 
+void timer1_stop(void){
+	TCCR1B &= ~((1 << CS12) | (1 << CS11) | (1 << CS10));	// set CS1 bits to 000, no clk source so timer1 is off
+ 29a:	e1 e8       	ldi	r30, 0x81	; 129
+ 29c:	f0 e0       	ldi	r31, 0x00	; 0
+ 29e:	80 81       	ld	r24, Z
+ 2a0:	88 7f       	andi	r24, 0xF8	; 248
+ 2a2:	80 83       	st	Z, r24
+ 2a4:	08 95       	ret
+
+000002a6 <timer1_reset>:
 }
-  ee:	90 93 c5 00 	sts	0x00C5, r25	; 0x8000c5 <__TEXT_REGION_LENGTH__+0x7f80c5>
-  f2:	80 93 c4 00 	sts	0x00C4, r24	; 0x8000c4 <__TEXT_REGION_LENGTH__+0x7f80c4>
-  f6:	10 92 c0 00 	sts	0x00C0, r1	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7f80c0>
-  fa:	e1 ec       	ldi	r30, 0xC1	; 193
-  fc:	f0 e0       	ldi	r31, 0x00	; 0
-  fe:	80 81       	ld	r24, Z
- 100:	88 60       	ori	r24, 0x08	; 8
- 102:	80 83       	st	Z, r24
- 104:	86 e0       	ldi	r24, 0x06	; 6
- 106:	80 93 c2 00 	sts	0x00C2, r24	; 0x8000c2 <__TEXT_REGION_LENGTH__+0x7f80c2>
- 10a:	08 95       	ret
 
-0000010c <uart_transmit>:
- 10c:	90 91 c0 00 	lds	r25, 0x00C0	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7f80c0>
- 110:	95 ff       	sbrs	r25, 5
- 112:	fc cf       	rjmp	.-8      	; 0x10c <uart_transmit>
- 114:	80 93 c6 00 	sts	0x00C6, r24	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7f80c6>
- 118:	08 95       	ret
+void timer1_reset(void)
+{	
+	
+	TCNT1 = 0;	//reset timer1 counter to 0
+ 2a6:	10 92 85 00 	sts	0x0085, r1	; 0x800085 <__TEXT_REGION_LENGTH__+0x7f8085>
+ 2aa:	10 92 84 00 	sts	0x0084, r1	; 0x800084 <__TEXT_REGION_LENGTH__+0x7f8084>
+	TIFR1 = (1 << OCF1B);		// clear compare b flag 
+ 2ae:	84 e0       	ldi	r24, 0x04	; 4
+ 2b0:	86 bb       	out	0x16, r24	; 22
+ 2b2:	08 95       	ret
 
-0000011a <transmit_uart_frame>:
+000002b4 <zc_init>:
+static volatile uint8_t zc_flag = 0;
 
-// Sends "voltage,current,power\n" - the compact format the ESP32 bridge parses.
-// Different from the transmit_*_message functions above, which build the
-// human-readable text meant for a terminal, not for the ESP link.
-void transmit_uart_frame(float voltage, float current, float power) {
- 11a:	4f 92       	push	r4
- 11c:	5f 92       	push	r5
- 11e:	6f 92       	push	r6
- 120:	7f 92       	push	r7
- 122:	8f 92       	push	r8
- 124:	9f 92       	push	r9
- 126:	af 92       	push	r10
- 128:	bf 92       	push	r11
- 12a:	cf 92       	push	r12
- 12c:	df 92       	push	r13
- 12e:	ef 92       	push	r14
- 130:	ff 92       	push	r15
- 132:	0f 93       	push	r16
- 134:	1f 93       	push	r17
- 136:	cf 93       	push	r28
- 138:	df 93       	push	r29
- 13a:	4b 01       	movw	r8, r22
- 13c:	5c 01       	movw	r10, r24
- 13e:	29 01       	movw	r4, r18
- 140:	3a 01       	movw	r6, r20
- 142:	67 01       	movw	r12, r14
- 144:	78 01       	movw	r14, r16
-	int8_t offset = 48;
 
-	// Voltage: XX.X
-	uart_transmit((((int)voltage / 10) % 10) + offset);
- 146:	0e 94 60 01 	call	0x2c0	; 0x2c0 <__fixsfsi>
- 14a:	ca e0       	ldi	r28, 0x0A	; 10
- 14c:	d0 e0       	ldi	r29, 0x00	; 0
- 14e:	cb 01       	movw	r24, r22
- 150:	be 01       	movw	r22, r28
- 152:	0e 94 54 02 	call	0x4a8	; 0x4a8 <__divmodhi4>
- 156:	18 2f       	mov	r17, r24
- 158:	cb 01       	movw	r24, r22
- 15a:	be 01       	movw	r22, r28
- 15c:	0e 94 54 02 	call	0x4a8	; 0x4a8 <__divmodhi4>
- 160:	80 5d       	subi	r24, 0xD0	; 208
- 162:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
-	uart_transmit((((int)voltage) % 10) + offset);
- 166:	80 e3       	ldi	r24, 0x30	; 48
- 168:	81 0f       	add	r24, r17
- 16a:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
-	uart_transmit('.');
- 16e:	8e e2       	ldi	r24, 0x2E	; 46
- 170:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
-	uart_transmit((((int)(voltage * 10)) % 10) + offset);
- 174:	20 e0       	ldi	r18, 0x00	; 0
- 176:	30 e0       	ldi	r19, 0x00	; 0
- 178:	40 e2       	ldi	r20, 0x20	; 32
- 17a:	51 e4       	ldi	r21, 0x41	; 65
- 17c:	c5 01       	movw	r24, r10
- 17e:	b4 01       	movw	r22, r8
- 180:	0e 94 bf 01 	call	0x37e	; 0x37e <__mulsf3>
- 184:	0e 94 60 01 	call	0x2c0	; 0x2c0 <__fixsfsi>
- 188:	cb 01       	movw	r24, r22
- 18a:	be 01       	movw	r22, r28
- 18c:	0e 94 54 02 	call	0x4a8	; 0x4a8 <__divmodhi4>
- 190:	80 5d       	subi	r24, 0xD0	; 208
- 192:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
+// one-time setup: configure INT0 for a rising edge
+void zc_init(void){			
+	DDRD |= (1<<2);	// set PD2 as input as this is the INT0 pin 		
+ 2b4:	8a b1       	in	r24, 0x0a	; 10
+ 2b6:	84 60       	ori	r24, 0x04	; 4
+ 2b8:	8a b9       	out	0x0a, r24	; 10
+	EIMSK |= (1<<INT0);			// enable INT0 external interrupt 
+ 2ba:	8d b3       	in	r24, 0x1d	; 29
+ 2bc:	81 60       	ori	r24, 0x01	; 1
+ 2be:	8d bb       	out	0x1d, r24	; 29
+	EICRA |= (1<<ISC01)|(1<<ISC00); // set interrupt to be rising edge ISC bits => 11
+ 2c0:	e9 e6       	ldi	r30, 0x69	; 105
+ 2c2:	f0 e0       	ldi	r31, 0x00	; 0
+ 2c4:	80 81       	ld	r24, Z
+ 2c6:	83 60       	ori	r24, 0x03	; 3
+ 2c8:	80 83       	st	Z, r24
+ 2ca:	08 95       	ret
 
-	uart_transmit(',');
- 196:	8c e2       	ldi	r24, 0x2C	; 44
- 198:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
+000002cc <zc_wait_for_edge>:
+// used by capture file to make sure both V and I bursts are taken from the relative same point on the V wave
+uint8_t zc_wait_for_edge(void)
+{
+	uint16_t timeout = ZC_TIMEOUT_LOOPS;
 
-	// Current: XXX (already in mA, integer, no decimal point)
-	uart_transmit((((int)current / 100) % 10) + offset);
- 19c:	c3 01       	movw	r24, r6
- 19e:	b2 01       	movw	r22, r4
- 1a0:	0e 94 60 01 	call	0x2c0	; 0x2c0 <__fixsfsi>
- 1a4:	5b 01       	movw	r10, r22
- 1a6:	cb 01       	movw	r24, r22
- 1a8:	64 e6       	ldi	r22, 0x64	; 100
- 1aa:	70 e0       	ldi	r23, 0x00	; 0
- 1ac:	0e 94 54 02 	call	0x4a8	; 0x4a8 <__divmodhi4>
- 1b0:	cb 01       	movw	r24, r22
- 1b2:	be 01       	movw	r22, r28
- 1b4:	0e 94 54 02 	call	0x4a8	; 0x4a8 <__divmodhi4>
- 1b8:	80 5d       	subi	r24, 0xD0	; 208
- 1ba:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
-	uart_transmit((((int)current / 10) % 10) + offset);
- 1be:	c5 01       	movw	r24, r10
- 1c0:	be 01       	movw	r22, r28
- 1c2:	0e 94 54 02 	call	0x4a8	; 0x4a8 <__divmodhi4>
- 1c6:	18 2f       	mov	r17, r24
- 1c8:	cb 01       	movw	r24, r22
- 1ca:	be 01       	movw	r22, r28
- 1cc:	0e 94 54 02 	call	0x4a8	; 0x4a8 <__divmodhi4>
- 1d0:	80 5d       	subi	r24, 0xD0	; 208
- 1d2:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
-	uart_transmit((((int)current) % 10) + offset);
- 1d6:	80 e3       	ldi	r24, 0x30	; 48
- 1d8:	81 0f       	add	r24, r17
- 1da:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
+	zc_flag = 0;             // reset the "did an edge happen" flag
+ 2cc:	10 92 27 04 	sts	0x0427, r1	; 0x800427 <zc_flag>
+	EIFR  = (1 << INTF0);    // clear any STALE pending edge from before we were ready
+ 2d0:	81 e0       	ldi	r24, 0x01	; 1
+ 2d2:	8c bb       	out	0x1c, r24	; 28
+	EIMSK |= (1 << INT0);    // turn on INT0 interput  
+ 2d4:	8d b3       	in	r24, 0x1d	; 29
+ 2d6:	81 60       	ori	r24, 0x01	; 1
+ 2d8:	8d bb       	out	0x1d, r24	; 29
+}
 
-	uart_transmit(',');
- 1de:	8c e2       	ldi	r24, 0x2C	; 44
- 1e0:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
+// used by capture file to make sure both V and I bursts are taken from the relative same point on the V wave
+uint8_t zc_wait_for_edge(void)
+{
+	uint16_t timeout = ZC_TIMEOUT_LOOPS;
+ 2da:	80 e2       	ldi	r24, 0x20	; 32
+ 2dc:	9e e4       	ldi	r25, 0x4E	; 78
+	zc_flag = 0;             // reset the "did an edge happen" flag
+	EIFR  = (1 << INTF0);    // clear any STALE pending edge from before we were ready
+	EIMSK |= (1 << INT0);    // turn on INT0 interput  
+	
+	// loop that just checks if either zc flag is 0 or still time left before timeout, continue the block loop
+	while (!zc_flag && --timeout) {
+ 2de:	20 91 27 04 	lds	r18, 0x0427	; 0x800427 <zc_flag>
+ 2e2:	21 11       	cpse	r18, r1
+ 2e4:	02 c0       	rjmp	.+4      	; 0x2ea <zc_wait_for_edge+0x1e>
+ 2e6:	01 97       	sbiw	r24, 0x01	; 1
+ 2e8:	d1 f7       	brne	.-12     	; 0x2de <zc_wait_for_edge+0x12>
+		// just sit here
+	}
 
-	// Power: X.XX
-	uart_transmit((((int)power) % 10) + offset);
- 1e4:	c7 01       	movw	r24, r14
- 1e6:	b6 01       	movw	r22, r12
- 1e8:	0e 94 60 01 	call	0x2c0	; 0x2c0 <__fixsfsi>
- 1ec:	cb 01       	movw	r24, r22
- 1ee:	be 01       	movw	r22, r28
- 1f0:	0e 94 54 02 	call	0x4a8	; 0x4a8 <__divmodhi4>
- 1f4:	80 5d       	subi	r24, 0xD0	; 208
- 1f6:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
-	uart_transmit('.');
- 1fa:	8e e2       	ldi	r24, 0x2E	; 46
- 1fc:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
-	uart_transmit((((int)(power * 10)) % 10) + offset);
- 200:	20 e0       	ldi	r18, 0x00	; 0
- 202:	30 e0       	ldi	r19, 0x00	; 0
- 204:	40 e2       	ldi	r20, 0x20	; 32
- 206:	51 e4       	ldi	r21, 0x41	; 65
- 208:	c7 01       	movw	r24, r14
- 20a:	b6 01       	movw	r22, r12
- 20c:	0e 94 bf 01 	call	0x37e	; 0x37e <__mulsf3>
- 210:	0e 94 60 01 	call	0x2c0	; 0x2c0 <__fixsfsi>
- 214:	cb 01       	movw	r24, r22
- 216:	be 01       	movw	r22, r28
- 218:	0e 94 54 02 	call	0x4a8	; 0x4a8 <__divmodhi4>
- 21c:	80 5d       	subi	r24, 0xD0	; 208
- 21e:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
-	uart_transmit((((int)(power * 100)) % 10) + offset);
- 222:	20 e0       	ldi	r18, 0x00	; 0
- 224:	30 e0       	ldi	r19, 0x00	; 0
- 226:	48 ec       	ldi	r20, 0xC8	; 200
- 228:	52 e4       	ldi	r21, 0x42	; 66
- 22a:	c7 01       	movw	r24, r14
- 22c:	b6 01       	movw	r22, r12
- 22e:	0e 94 bf 01 	call	0x37e	; 0x37e <__mulsf3>
- 232:	0e 94 60 01 	call	0x2c0	; 0x2c0 <__fixsfsi>
- 236:	cb 01       	movw	r24, r22
- 238:	be 01       	movw	r22, r28
- 23a:	0e 94 54 02 	call	0x4a8	; 0x4a8 <__divmodhi4>
- 23e:	80 5d       	subi	r24, 0xD0	; 208
- 240:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
-
-	uart_transmit('\n');
- 244:	8a e0       	ldi	r24, 0x0A	; 10
- 246:	0e 94 86 00 	call	0x10c	; 0x10c <uart_transmit>
- 24a:	df 91       	pop	r29
- 24c:	cf 91       	pop	r28
- 24e:	1f 91       	pop	r17
- 250:	0f 91       	pop	r16
- 252:	ff 90       	pop	r15
- 254:	ef 90       	pop	r14
- 256:	df 90       	pop	r13
- 258:	cf 90       	pop	r12
- 25a:	bf 90       	pop	r11
- 25c:	af 90       	pop	r10
- 25e:	9f 90       	pop	r9
- 260:	8f 90       	pop	r8
- 262:	7f 90       	pop	r7
- 264:	6f 90       	pop	r6
- 266:	5f 90       	pop	r5
- 268:	4f 90       	pop	r4
- 26a:	08 95       	ret
-
-0000026c <__vector_1>:
+	
+	if (!zc_flag) {
+ 2ea:	80 91 27 04 	lds	r24, 0x0427	; 0x800427 <zc_flag>
+ 2ee:	81 11       	cpse	r24, r1
+ 2f0:	04 c0       	rjmp	.+8      	; 0x2fa <zc_wait_for_edge+0x2e>
+		EIMSK &= ~(1 << INT0);   // gave up - disarm so a late edge is ignored
+ 2f2:	9d b3       	in	r25, 0x1d	; 29
+ 2f4:	9e 7f       	andi	r25, 0xFE	; 254
+ 2f6:	9d bb       	out	0x1d, r25	; 29
+		return 0;                // failure: no signal
+ 2f8:	08 95       	ret
 	}
 	return 1;                    // success: a real edge was seen
+ 2fa:	81 e0       	ldi	r24, 0x01	; 1
 }
+ 2fc:	08 95       	ret
+
+000002fe <__vector_1>:
 
 ISR(INT0_vect)
 {	
- 26c:	1f 92       	push	r1
- 26e:	0f 92       	push	r0
- 270:	0f b6       	in	r0, 0x3f	; 63
- 272:	0f 92       	push	r0
- 274:	11 24       	eor	r1, r1
- 276:	2f 93       	push	r18
- 278:	3f 93       	push	r19
- 27a:	4f 93       	push	r20
- 27c:	5f 93       	push	r21
- 27e:	6f 93       	push	r22
- 280:	7f 93       	push	r23
- 282:	8f 93       	push	r24
- 284:	9f 93       	push	r25
- 286:	af 93       	push	r26
- 288:	bf 93       	push	r27
- 28a:	ef 93       	push	r30
- 28c:	ff 93       	push	r31
+ 2fe:	1f 92       	push	r1
+ 300:	0f 92       	push	r0
+ 302:	0f b6       	in	r0, 0x3f	; 63
+ 304:	0f 92       	push	r0
+ 306:	11 24       	eor	r1, r1
+ 308:	2f 93       	push	r18
+ 30a:	3f 93       	push	r19
+ 30c:	4f 93       	push	r20
+ 30e:	5f 93       	push	r21
+ 310:	6f 93       	push	r22
+ 312:	7f 93       	push	r23
+ 314:	8f 93       	push	r24
+ 316:	9f 93       	push	r25
+ 318:	af 93       	push	r26
+ 31a:	bf 93       	push	r27
+ 31c:	ef 93       	push	r30
+ 31e:	ff 93       	push	r31
 	// start timer1, will be used to set adc sampling frequency 
 	timer1_start();
- 28e:	0e 94 71 00 	call	0xe2	; 0xe2 <timer1_start>
+ 320:	0e 94 47 01 	call	0x28e	; 0x28e <timer1_start>
 	
 	// gnore any further edges until zc_wait_for_edge() calls this again for the next burst.
 	
 	EIMSK &= (uint8_t)~(1 << INT0);
- 292:	8d b3       	in	r24, 0x1d	; 29
- 294:	8e 7f       	andi	r24, 0xFE	; 254
- 296:	8d bb       	out	0x1d, r24	; 29
+ 324:	8d b3       	in	r24, 0x1d	; 29
+ 326:	8e 7f       	andi	r24, 0xFE	; 254
+ 328:	8d bb       	out	0x1d, r24	; 29
 	
 	zc_flag = 1;
- 298:	81 e0       	ldi	r24, 0x01	; 1
- 29a:	80 93 00 01 	sts	0x0100, r24	; 0x800100 <__DATA_REGION_ORIGIN__>
- 29e:	ff 91       	pop	r31
- 2a0:	ef 91       	pop	r30
- 2a2:	bf 91       	pop	r27
- 2a4:	af 91       	pop	r26
- 2a6:	9f 91       	pop	r25
- 2a8:	8f 91       	pop	r24
- 2aa:	7f 91       	pop	r23
- 2ac:	6f 91       	pop	r22
- 2ae:	5f 91       	pop	r21
- 2b0:	4f 91       	pop	r20
- 2b2:	3f 91       	pop	r19
- 2b4:	2f 91       	pop	r18
- 2b6:	0f 90       	pop	r0
- 2b8:	0f be       	out	0x3f, r0	; 63
- 2ba:	0f 90       	pop	r0
- 2bc:	1f 90       	pop	r1
- 2be:	18 95       	reti
+ 32a:	81 e0       	ldi	r24, 0x01	; 1
+ 32c:	80 93 27 04 	sts	0x0427, r24	; 0x800427 <zc_flag>
+ 330:	ff 91       	pop	r31
+ 332:	ef 91       	pop	r30
+ 334:	bf 91       	pop	r27
+ 336:	af 91       	pop	r26
+ 338:	9f 91       	pop	r25
+ 33a:	8f 91       	pop	r24
+ 33c:	7f 91       	pop	r23
+ 33e:	6f 91       	pop	r22
+ 340:	5f 91       	pop	r21
+ 342:	4f 91       	pop	r20
+ 344:	3f 91       	pop	r19
+ 346:	2f 91       	pop	r18
+ 348:	0f 90       	pop	r0
+ 34a:	0f be       	out	0x3f, r0	; 63
+ 34c:	0f 90       	pop	r0
+ 34e:	1f 90       	pop	r1
+ 350:	18 95       	reti
 
-000002c0 <__fixsfsi>:
- 2c0:	0e 94 67 01 	call	0x2ce	; 0x2ce <__fixunssfsi>
- 2c4:	68 94       	set
- 2c6:	b1 11       	cpse	r27, r1
- 2c8:	0c 94 b9 01 	jmp	0x372	; 0x372 <__fp_szero>
- 2cc:	08 95       	ret
+00000352 <_exit>:
+ 352:	f8 94       	cli
 
-000002ce <__fixunssfsi>:
- 2ce:	0e 94 9e 01 	call	0x33c	; 0x33c <__fp_splitA>
- 2d2:	88 f0       	brcs	.+34     	; 0x2f6 <__fixunssfsi+0x28>
- 2d4:	9f 57       	subi	r25, 0x7F	; 127
- 2d6:	98 f0       	brcs	.+38     	; 0x2fe <__fixunssfsi+0x30>
- 2d8:	b9 2f       	mov	r27, r25
- 2da:	99 27       	eor	r25, r25
- 2dc:	b7 51       	subi	r27, 0x17	; 23
- 2de:	b0 f0       	brcs	.+44     	; 0x30c <__fixunssfsi+0x3e>
- 2e0:	e1 f0       	breq	.+56     	; 0x31a <__fixunssfsi+0x4c>
- 2e2:	66 0f       	add	r22, r22
- 2e4:	77 1f       	adc	r23, r23
- 2e6:	88 1f       	adc	r24, r24
- 2e8:	99 1f       	adc	r25, r25
- 2ea:	1a f0       	brmi	.+6      	; 0x2f2 <__fixunssfsi+0x24>
- 2ec:	ba 95       	dec	r27
- 2ee:	c9 f7       	brne	.-14     	; 0x2e2 <__fixunssfsi+0x14>
- 2f0:	14 c0       	rjmp	.+40     	; 0x31a <__fixunssfsi+0x4c>
- 2f2:	b1 30       	cpi	r27, 0x01	; 1
- 2f4:	91 f0       	breq	.+36     	; 0x31a <__fixunssfsi+0x4c>
- 2f6:	0e 94 b8 01 	call	0x370	; 0x370 <__fp_zero>
- 2fa:	b1 e0       	ldi	r27, 0x01	; 1
- 2fc:	08 95       	ret
- 2fe:	0c 94 b8 01 	jmp	0x370	; 0x370 <__fp_zero>
- 302:	67 2f       	mov	r22, r23
- 304:	78 2f       	mov	r23, r24
- 306:	88 27       	eor	r24, r24
- 308:	b8 5f       	subi	r27, 0xF8	; 248
- 30a:	39 f0       	breq	.+14     	; 0x31a <__fixunssfsi+0x4c>
- 30c:	b9 3f       	cpi	r27, 0xF9	; 249
- 30e:	cc f3       	brlt	.-14     	; 0x302 <__fixunssfsi+0x34>
- 310:	86 95       	lsr	r24
- 312:	77 95       	ror	r23
- 314:	67 95       	ror	r22
- 316:	b3 95       	inc	r27
- 318:	d9 f7       	brne	.-10     	; 0x310 <__fixunssfsi+0x42>
- 31a:	3e f4       	brtc	.+14     	; 0x32a <__fixunssfsi+0x5c>
- 31c:	90 95       	com	r25
- 31e:	80 95       	com	r24
- 320:	70 95       	com	r23
- 322:	61 95       	neg	r22
- 324:	7f 4f       	sbci	r23, 0xFF	; 255
- 326:	8f 4f       	sbci	r24, 0xFF	; 255
- 328:	9f 4f       	sbci	r25, 0xFF	; 255
- 32a:	08 95       	ret
-
-0000032c <__fp_split3>:
- 32c:	57 fd       	sbrc	r21, 7
- 32e:	90 58       	subi	r25, 0x80	; 128
- 330:	44 0f       	add	r20, r20
- 332:	55 1f       	adc	r21, r21
- 334:	59 f0       	breq	.+22     	; 0x34c <__fp_splitA+0x10>
- 336:	5f 3f       	cpi	r21, 0xFF	; 255
- 338:	71 f0       	breq	.+28     	; 0x356 <__fp_splitA+0x1a>
- 33a:	47 95       	ror	r20
-
-0000033c <__fp_splitA>:
- 33c:	88 0f       	add	r24, r24
- 33e:	97 fb       	bst	r25, 7
- 340:	99 1f       	adc	r25, r25
- 342:	61 f0       	breq	.+24     	; 0x35c <__fp_splitA+0x20>
- 344:	9f 3f       	cpi	r25, 0xFF	; 255
- 346:	79 f0       	breq	.+30     	; 0x366 <__fp_splitA+0x2a>
- 348:	87 95       	ror	r24
- 34a:	08 95       	ret
- 34c:	12 16       	cp	r1, r18
- 34e:	13 06       	cpc	r1, r19
- 350:	14 06       	cpc	r1, r20
- 352:	55 1f       	adc	r21, r21
- 354:	f2 cf       	rjmp	.-28     	; 0x33a <__fp_split3+0xe>
- 356:	46 95       	lsr	r20
- 358:	f1 df       	rcall	.-30     	; 0x33c <__fp_splitA>
- 35a:	08 c0       	rjmp	.+16     	; 0x36c <__fp_splitA+0x30>
- 35c:	16 16       	cp	r1, r22
- 35e:	17 06       	cpc	r1, r23
- 360:	18 06       	cpc	r1, r24
- 362:	99 1f       	adc	r25, r25
- 364:	f1 cf       	rjmp	.-30     	; 0x348 <__fp_splitA+0xc>
- 366:	86 95       	lsr	r24
- 368:	71 05       	cpc	r23, r1
- 36a:	61 05       	cpc	r22, r1
- 36c:	08 94       	sec
- 36e:	08 95       	ret
-
-00000370 <__fp_zero>:
- 370:	e8 94       	clt
-
-00000372 <__fp_szero>:
- 372:	bb 27       	eor	r27, r27
- 374:	66 27       	eor	r22, r22
- 376:	77 27       	eor	r23, r23
- 378:	cb 01       	movw	r24, r22
- 37a:	97 f9       	bld	r25, 7
- 37c:	08 95       	ret
-
-0000037e <__mulsf3>:
- 37e:	0e 94 d2 01 	call	0x3a4	; 0x3a4 <__mulsf3x>
- 382:	0c 94 43 02 	jmp	0x486	; 0x486 <__fp_round>
- 386:	0e 94 35 02 	call	0x46a	; 0x46a <__fp_pscA>
- 38a:	38 f0       	brcs	.+14     	; 0x39a <__mulsf3+0x1c>
- 38c:	0e 94 3c 02 	call	0x478	; 0x478 <__fp_pscB>
- 390:	20 f0       	brcs	.+8      	; 0x39a <__mulsf3+0x1c>
- 392:	95 23       	and	r25, r21
- 394:	11 f0       	breq	.+4      	; 0x39a <__mulsf3+0x1c>
- 396:	0c 94 2c 02 	jmp	0x458	; 0x458 <__fp_inf>
- 39a:	0c 94 32 02 	jmp	0x464	; 0x464 <__fp_nan>
- 39e:	11 24       	eor	r1, r1
- 3a0:	0c 94 b9 01 	jmp	0x372	; 0x372 <__fp_szero>
-
-000003a4 <__mulsf3x>:
- 3a4:	0e 94 96 01 	call	0x32c	; 0x32c <__fp_split3>
- 3a8:	70 f3       	brcs	.-36     	; 0x386 <__mulsf3+0x8>
-
-000003aa <__mulsf3_pse>:
- 3aa:	95 9f       	mul	r25, r21
- 3ac:	c1 f3       	breq	.-16     	; 0x39e <__mulsf3+0x20>
- 3ae:	95 0f       	add	r25, r21
- 3b0:	50 e0       	ldi	r21, 0x00	; 0
- 3b2:	55 1f       	adc	r21, r21
- 3b4:	62 9f       	mul	r22, r18
- 3b6:	f0 01       	movw	r30, r0
- 3b8:	72 9f       	mul	r23, r18
- 3ba:	bb 27       	eor	r27, r27
- 3bc:	f0 0d       	add	r31, r0
- 3be:	b1 1d       	adc	r27, r1
- 3c0:	63 9f       	mul	r22, r19
- 3c2:	aa 27       	eor	r26, r26
- 3c4:	f0 0d       	add	r31, r0
- 3c6:	b1 1d       	adc	r27, r1
- 3c8:	aa 1f       	adc	r26, r26
- 3ca:	64 9f       	mul	r22, r20
- 3cc:	66 27       	eor	r22, r22
- 3ce:	b0 0d       	add	r27, r0
- 3d0:	a1 1d       	adc	r26, r1
- 3d2:	66 1f       	adc	r22, r22
- 3d4:	82 9f       	mul	r24, r18
- 3d6:	22 27       	eor	r18, r18
- 3d8:	b0 0d       	add	r27, r0
- 3da:	a1 1d       	adc	r26, r1
- 3dc:	62 1f       	adc	r22, r18
- 3de:	73 9f       	mul	r23, r19
- 3e0:	b0 0d       	add	r27, r0
- 3e2:	a1 1d       	adc	r26, r1
- 3e4:	62 1f       	adc	r22, r18
- 3e6:	83 9f       	mul	r24, r19
- 3e8:	a0 0d       	add	r26, r0
- 3ea:	61 1d       	adc	r22, r1
- 3ec:	22 1f       	adc	r18, r18
- 3ee:	74 9f       	mul	r23, r20
- 3f0:	33 27       	eor	r19, r19
- 3f2:	a0 0d       	add	r26, r0
- 3f4:	61 1d       	adc	r22, r1
- 3f6:	23 1f       	adc	r18, r19
- 3f8:	84 9f       	mul	r24, r20
- 3fa:	60 0d       	add	r22, r0
- 3fc:	21 1d       	adc	r18, r1
- 3fe:	82 2f       	mov	r24, r18
- 400:	76 2f       	mov	r23, r22
- 402:	6a 2f       	mov	r22, r26
- 404:	11 24       	eor	r1, r1
- 406:	9f 57       	subi	r25, 0x7F	; 127
- 408:	50 40       	sbci	r21, 0x00	; 0
- 40a:	9a f0       	brmi	.+38     	; 0x432 <__EEPROM_REGION_LENGTH__+0x32>
- 40c:	f1 f0       	breq	.+60     	; 0x44a <__EEPROM_REGION_LENGTH__+0x4a>
- 40e:	88 23       	and	r24, r24
- 410:	4a f0       	brmi	.+18     	; 0x424 <__EEPROM_REGION_LENGTH__+0x24>
- 412:	ee 0f       	add	r30, r30
- 414:	ff 1f       	adc	r31, r31
- 416:	bb 1f       	adc	r27, r27
- 418:	66 1f       	adc	r22, r22
- 41a:	77 1f       	adc	r23, r23
- 41c:	88 1f       	adc	r24, r24
- 41e:	91 50       	subi	r25, 0x01	; 1
- 420:	50 40       	sbci	r21, 0x00	; 0
- 422:	a9 f7       	brne	.-22     	; 0x40e <__EEPROM_REGION_LENGTH__+0xe>
- 424:	9e 3f       	cpi	r25, 0xFE	; 254
- 426:	51 05       	cpc	r21, r1
- 428:	80 f0       	brcs	.+32     	; 0x44a <__EEPROM_REGION_LENGTH__+0x4a>
- 42a:	0c 94 2c 02 	jmp	0x458	; 0x458 <__fp_inf>
- 42e:	0c 94 b9 01 	jmp	0x372	; 0x372 <__fp_szero>
- 432:	5f 3f       	cpi	r21, 0xFF	; 255
- 434:	e4 f3       	brlt	.-8      	; 0x42e <__EEPROM_REGION_LENGTH__+0x2e>
- 436:	98 3e       	cpi	r25, 0xE8	; 232
- 438:	d4 f3       	brlt	.-12     	; 0x42e <__EEPROM_REGION_LENGTH__+0x2e>
- 43a:	86 95       	lsr	r24
- 43c:	77 95       	ror	r23
- 43e:	67 95       	ror	r22
- 440:	b7 95       	ror	r27
- 442:	f7 95       	ror	r31
- 444:	e7 95       	ror	r30
- 446:	9f 5f       	subi	r25, 0xFF	; 255
- 448:	c1 f7       	brne	.-16     	; 0x43a <__EEPROM_REGION_LENGTH__+0x3a>
- 44a:	fe 2b       	or	r31, r30
- 44c:	88 0f       	add	r24, r24
- 44e:	91 1d       	adc	r25, r1
- 450:	96 95       	lsr	r25
- 452:	87 95       	ror	r24
- 454:	97 f9       	bld	r25, 7
- 456:	08 95       	ret
-
-00000458 <__fp_inf>:
- 458:	97 f9       	bld	r25, 7
- 45a:	9f 67       	ori	r25, 0x7F	; 127
- 45c:	80 e8       	ldi	r24, 0x80	; 128
- 45e:	70 e0       	ldi	r23, 0x00	; 0
- 460:	60 e0       	ldi	r22, 0x00	; 0
- 462:	08 95       	ret
-
-00000464 <__fp_nan>:
- 464:	9f ef       	ldi	r25, 0xFF	; 255
- 466:	80 ec       	ldi	r24, 0xC0	; 192
- 468:	08 95       	ret
-
-0000046a <__fp_pscA>:
- 46a:	00 24       	eor	r0, r0
- 46c:	0a 94       	dec	r0
- 46e:	16 16       	cp	r1, r22
- 470:	17 06       	cpc	r1, r23
- 472:	18 06       	cpc	r1, r24
- 474:	09 06       	cpc	r0, r25
- 476:	08 95       	ret
-
-00000478 <__fp_pscB>:
- 478:	00 24       	eor	r0, r0
- 47a:	0a 94       	dec	r0
- 47c:	12 16       	cp	r1, r18
- 47e:	13 06       	cpc	r1, r19
- 480:	14 06       	cpc	r1, r20
- 482:	05 06       	cpc	r0, r21
- 484:	08 95       	ret
-
-00000486 <__fp_round>:
- 486:	09 2e       	mov	r0, r25
- 488:	03 94       	inc	r0
- 48a:	00 0c       	add	r0, r0
- 48c:	11 f4       	brne	.+4      	; 0x492 <__fp_round+0xc>
- 48e:	88 23       	and	r24, r24
- 490:	52 f0       	brmi	.+20     	; 0x4a6 <__fp_round+0x20>
- 492:	bb 0f       	add	r27, r27
- 494:	40 f4       	brcc	.+16     	; 0x4a6 <__fp_round+0x20>
- 496:	bf 2b       	or	r27, r31
- 498:	11 f4       	brne	.+4      	; 0x49e <__fp_round+0x18>
- 49a:	60 ff       	sbrs	r22, 0
- 49c:	04 c0       	rjmp	.+8      	; 0x4a6 <__fp_round+0x20>
- 49e:	6f 5f       	subi	r22, 0xFF	; 255
- 4a0:	7f 4f       	sbci	r23, 0xFF	; 255
- 4a2:	8f 4f       	sbci	r24, 0xFF	; 255
- 4a4:	9f 4f       	sbci	r25, 0xFF	; 255
- 4a6:	08 95       	ret
-
-000004a8 <__divmodhi4>:
- 4a8:	97 fb       	bst	r25, 7
- 4aa:	07 2e       	mov	r0, r23
- 4ac:	16 f4       	brtc	.+4      	; 0x4b2 <__divmodhi4+0xa>
- 4ae:	00 94       	com	r0
- 4b0:	07 d0       	rcall	.+14     	; 0x4c0 <__divmodhi4_neg1>
- 4b2:	77 fd       	sbrc	r23, 7
- 4b4:	09 d0       	rcall	.+18     	; 0x4c8 <__divmodhi4_neg2>
- 4b6:	0e 94 68 02 	call	0x4d0	; 0x4d0 <__udivmodhi4>
- 4ba:	07 fc       	sbrc	r0, 7
- 4bc:	05 d0       	rcall	.+10     	; 0x4c8 <__divmodhi4_neg2>
- 4be:	3e f4       	brtc	.+14     	; 0x4ce <__divmodhi4_exit>
-
-000004c0 <__divmodhi4_neg1>:
- 4c0:	90 95       	com	r25
- 4c2:	81 95       	neg	r24
- 4c4:	9f 4f       	sbci	r25, 0xFF	; 255
- 4c6:	08 95       	ret
-
-000004c8 <__divmodhi4_neg2>:
- 4c8:	70 95       	com	r23
- 4ca:	61 95       	neg	r22
- 4cc:	7f 4f       	sbci	r23, 0xFF	; 255
-
-000004ce <__divmodhi4_exit>:
- 4ce:	08 95       	ret
-
-000004d0 <__udivmodhi4>:
- 4d0:	aa 1b       	sub	r26, r26
- 4d2:	bb 1b       	sub	r27, r27
- 4d4:	51 e1       	ldi	r21, 0x11	; 17
- 4d6:	07 c0       	rjmp	.+14     	; 0x4e6 <__udivmodhi4_ep>
-
-000004d8 <__udivmodhi4_loop>:
- 4d8:	aa 1f       	adc	r26, r26
- 4da:	bb 1f       	adc	r27, r27
- 4dc:	a6 17       	cp	r26, r22
- 4de:	b7 07       	cpc	r27, r23
- 4e0:	10 f0       	brcs	.+4      	; 0x4e6 <__udivmodhi4_ep>
- 4e2:	a6 1b       	sub	r26, r22
- 4e4:	b7 0b       	sbc	r27, r23
-
-000004e6 <__udivmodhi4_ep>:
- 4e6:	88 1f       	adc	r24, r24
- 4e8:	99 1f       	adc	r25, r25
- 4ea:	5a 95       	dec	r21
- 4ec:	a9 f7       	brne	.-22     	; 0x4d8 <__udivmodhi4_loop>
- 4ee:	80 95       	com	r24
- 4f0:	90 95       	com	r25
- 4f2:	bc 01       	movw	r22, r24
- 4f4:	cd 01       	movw	r24, r26
- 4f6:	08 95       	ret
-
-000004f8 <_exit>:
- 4f8:	f8 94       	cli
-
-000004fa <__stop_program>:
- 4fa:	ff cf       	rjmp	.-2      	; 0x4fa <__stop_program>
+00000354 <__stop_program>:
+ 354:	ff cf       	rjmp	.-2      	; 0x354 <__stop_program>

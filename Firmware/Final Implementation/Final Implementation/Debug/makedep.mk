@@ -4,6 +4,8 @@
 
 adc.c
 
+capture.c
+
 main.c
 
 timer.c

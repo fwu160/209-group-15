@@ -13,8 +13,8 @@
 #define BAUD 9600
 #define UBRR ((F_CPU / (16UL * BAUD)) - 1)
 
-#define SAMPLE_RATE_HZ  10000UL    /* samples per second, per channel   */
-#define N_SAMPLES       200        /* samples captured per channel/burst*/
+#define SAMPLE_RATE_HZ  10000UL    // samples per second, per channel   
+#define N_SAMPLES       200        // samples captured per channel/burst
  
 /* Timer1 top value for CTC mode, no prescaler (clk/1):
  * one compare match every (TIMER1_TOP + 1) CPU cycles.
@@ -25,8 +25,8 @@
 #define TIMER1_TOP      ((uint16_t)((F_CPU / SAMPLE_RATE_HZ) - 1))
 
 /* ---- ADC channels ---- */
-#define ADC_CHANNEL_V   0   /* ADC0 = conditioned voltage input */
-#define ADC_CHANNEL_I   1   /* ADC1 = conditioned current input */
+#define ADC_CHANNEL_V   0   // ADC0 = conditioned voltage input 
+#define ADC_CHANNEL_I   1   // ADC1 = conditioned current input 
 
 /* ---- Zero-cross input pin (comparator output -> INT0) ---- */
 #define ZC_DDR          DDRD
