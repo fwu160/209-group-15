@@ -34,7 +34,7 @@ namespace Config {
   // Baud has to match whatever the ATmega's USART is set to.
   constexpr unsigned long ATMEGA_BAUD = 9600;
   constexpr int ATMEGA_RX_PIN = 16;   // ESP RX2 <- ATmega TXD (through voltage divider, 5V->3.3V)
-  constexpr int ATMEGA_TX_PIN = 17;   // ESP TX2 -> ATmega RXD (we don't actually send anything back)
+  constexpr int ATMEGA_TX_PIN = -1; // 17;   // ESP TX2 -> ATmega RXD (we don't actually send anything back)
 
   // How long we wait without a new frame before deciding the ATmega has
   // dropped off. This is what feeds UartBridge::isConnected() and drives

@@ -4,6 +4,8 @@
 
 adc.c
 
+calculation.c
+
 capture.c
 
 main.c

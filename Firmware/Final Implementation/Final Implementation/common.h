@@ -36,6 +36,11 @@
  * zero-cross, in loop iterations (not milliseconds - it's a cheap
  * loop counter, not a hardware timer, so this is approximate). */
 #define ZC_TIMEOUT_LOOPS 20000U
+ 
+
+#define VOLTS_PER_COUNT  (5.0f / 1024.0f)      // ADC: 5V reference, 10-bit
+#define K_V   (VOLTS_PER_COUNT * 14.1f)        // source volts per count
+#define K_I   (VOLTS_PER_COUNT * 2.0f)         // load amps per count
 
 
 
