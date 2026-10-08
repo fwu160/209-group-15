@@ -4,13 +4,14 @@
 #include "Dashboardpage.h"
 
 // Turns a Reading into the JSON string the dashboard's JS expects, e.g.
-// {"v":14.5,"i":300,"p":6.43,"t":123456,"c":1}
+// {"v":14.5,"i":300,"p":6.43,"ph":36.9,"t":123456,"c":1}
+// "ph" = phase difference between voltage and current, in degrees.
 // "c" = 1 if the ATmega's UART link is currently up, 0 if it's gone quiet.
 String TelemetryServer::toJson(const Reading& r, bool connected) {
   char json[144];
   snprintf(json, sizeof(json),
-    "{\"v\":%.1f,\"i\":%.0f,\"p\":%.2f,\"t\":%lu,\"c\":%d}",
-    r.voltage, r.current, r.power, r.millisAtFrame, connected ? 1 : 0);
+    "{\"v\":%.1f,\"i\":%.0f,\"p\":%.2f,\"ph\":%.1f,\"t\":%lu,\"c\":%d}",
+    r.voltage, r.current, r.power, r.phase, r.millisAtFrame, connected ? 1 : 0);
   return String(json);
 }
 
@@ -64,8 +65,8 @@ void TelemetryServer::begin(const char* mdnsName) {
     }
     char json[192];
     snprintf(json, sizeof(json),
-      "{\"v\":%.1f,\"i\":%.0f,\"p\":%.2f,\"ageMs\":%lu,\"connected\":%d}",
-      last_->voltage, last_->current, last_->power, millis() - last_->millisAtFrame, connected ? 1 : 0);
+      "{\"v\":%.1f,\"i\":%.0f,\"p\":%.2f,\"ph\":%.1f,\"ageMs\":%lu,\"connected\":%d}",
+      last_->voltage, last_->current, last_->power, last_->phase, millis() - last_->millisAtFrame, connected ? 1 : 0);
     request->send(200, "application/json", json);
   });
 

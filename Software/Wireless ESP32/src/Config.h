@@ -7,7 +7,7 @@ namespace Config {
 
   // ESP32 makes its own WiFi network (access point) instead of joining
   // the uni/home WiFi, so it works the same no matter where we demo it.
-  constexpr const char* AP_SSID = "EnergyMonitor";
+  constexpr const char* AP_SSID = "Team15_EnergyMonitor";
 
   // No password = open network, so a phone can just join without typing
   // anything. If we want one later: WiFi.softAP(Config::AP_SSID, "pw") in main.cpp

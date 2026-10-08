@@ -6,13 +6,14 @@ struct Reading {
   float voltage = 0;
   float current = 0;
   float power = 0;
+  float phase = 0;                   // phase difference between voltage and current, in degrees
   unsigned long millisAtFrame = 0;   // millis() timestamp of when this reading came in
 };
 
 // Callback type - gets called every time we finish parsing a new reading.
 using ReadingCallback = void (*)(const Reading&);
 
-// Listens on a UART port for lines like "230.42,2.351,541.87" and turns
+// Listens on a UART port for lines like "14.0,505,4.99,36.9" and turns
 // them into Reading structs. Non-blocking, just call poll() every loop().
 class UartBridge {
 public:

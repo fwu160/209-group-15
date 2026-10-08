@@ -46,7 +46,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
   .subtitle { font-size: 13px; color: var(--muted); margin: 0 0 24px; }
 
-  /* top row: demo button on the left, status dot pinned right */
+  /* top row: status dot pinned right */
   .topbar {
     display: flex;
     align-items: center;
@@ -57,20 +57,6 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     padding: 14px 16px;
     margin-bottom: 24px;
   }
-
-  /* Demo button - outline only so it doesn't fight visually with the
-     status indicator sitting right next to it. */
-  .topbar button.secondary {
-    background: #fff;
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 9px 18px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-  .topbar button.secondary:hover { opacity: 0.9; }
 
   /* status dot + text, pushed to the right edge via margin-left: auto */
   .status {
@@ -89,10 +75,10 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   }
   .dot.live { background: var(--live); }
 
-  /* 3 meter cards in a row (voltage/current/power) */
+  /* 4 meter cards in a row (voltage/current/power/phase) */
   .meters {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 14px;
     margin-bottom: 14px;
     transition: opacity 0.2s ease;
@@ -118,9 +104,9 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   .graph .label { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
   canvas { width: 100%; height: 180px; display: block; }
 
-  /* stack meter cards on small screens instead of squashing them */
-  @media (max-width: 560px) {
-    .meters { grid-template-columns: 1fr; }
+  /* 2 x 2 grid on small screens instead of squashing 4 cards into one row */
+  @media (max-width: 640px) {
+    .meters { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
@@ -131,21 +117,13 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   <p class="subtitle">Live readings from the ESP32 bridge</p>
 
   <div class="topbar">
-    <!-- ===== DEMO MODE (markup) =====
-         To remove demo mode: delete this <button>, the
-         ".topbar button.secondary" CSS rule above (optional tidy-up,
-         harmless to leave), and the whole "DEMO MODE" block down in
-         <script> below. Nothing else needs to change. -->
-    <button id="demoBtn" class="secondary">Demo data</button>
-    <!-- ===== END DEMO MODE (markup) ===== -->
-
     <div class="status">
       <span class="dot" id="statusDot"></span>
       <span id="statusText">Connecting…</span>
     </div>
   </div>
 
-  <!-- the 3 live readouts -->
+  <!-- the 4 live readouts -->
   <div class="meters" id="meters">
     <div class="meter">
       <div class="label">Voltage</div>
@@ -158,6 +136,10 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     <div class="meter">
       <div class="label">Power</div>
       <div class="value" id="pVal">--<span class="unit">W</span></div>
+    </div>
+    <div class="meter">
+      <div class="label">Phase difference</div>
+      <div class="value" id="phVal">--<span class="unit">&deg;</span></div>
     </div>
   </div>
 
@@ -173,6 +155,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   const vVal = document.getElementById('vVal');
   const iVal = document.getElementById('iVal');
   const pVal = document.getElementById('pVal');
+  const phVal = document.getElementById('phVal');
   const metersEl = document.getElementById('meters');
   const statusDot = document.getElementById('statusDot');
   const statusText = document.getElementById('statusText');
@@ -197,7 +180,6 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   // Page is always served by the ESP32 itself, so it always talks back
   // to whatever host served it (location.host) - nothing to configure.
   function connect() {
-    if (typeof stopDemo === 'function') stopDemo();   // don't let demo data fight real data
     if (ws) ws.close();   // close any old connection first
 
     // ws:// is basically http:// but the connection stays open, so the
@@ -213,7 +195,8 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     ws.onerror = () => setStatus(false, 'Connection error');
     ws.onmessage = (evt) => {
       // Every message is a small JSON blob, e.g.
-      // {"v":230.42,"i":2.351,"p":541.87,"t":123456,"c":1}
+      // {"v":14.0,"i":505,"p":4.99,"ph":36.9,"t":123456,"c":1}
+      // "ph" is the phase difference between voltage and current, in degrees.
       // "c" is 1 if the ATmega's UART is actively sending, 0 if it's
       // gone quiet - the only source of truth for the status dot. Sent
       // on both new readings and a periodic heartbeat, so a dead link
@@ -222,7 +205,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
         const d = JSON.parse(evt.data);
         const live = !!d.c;
         setStatus(live, live ? 'Connected' : 'Disconnected');
-        if (live) updateReading(d.v, d.i, d.p);
+        if (live) updateReading(d.v, d.i, d.p, d.ph);
       } catch (e) {
         // Malformed/cut-off message - just ignore it, another one's coming soon.
       }
@@ -230,14 +213,15 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   }
 
   // ---- pushes a new reading onto the page ----
-  // Both the real WebSocket data and demo mode call this, so the
-  // meters/graph behave the same either way.
-  function updateReading(v, i, p) {
+  // Called for every message that arrives while the ATmega is live.
+  function updateReading(v, i, p, ph) {
     // innerHTML (not textContent) since we need the <span class="unit"> back each time.
     // Formats match spec: voltage to 1dp, current as a whole number in mA, power to 2dp.
+    // Phase difference is shown in degrees to 1dp (0 if the ESP32 didn't send one).
     vVal.innerHTML = v.toFixed(1) + '<span class="unit">V</span>';
     iVal.innerHTML = Math.round(i) + '<span class="unit">mA</span>';
     pVal.innerHTML = p.toFixed(2) + '<span class="unit">W</span>';
+    phVal.innerHTML = (ph || 0).toFixed(1) + '<span class="unit">&deg;</span>';
 
     history.push(p);
     if (history.length > MAX_POINTS) history.shift();   // drop oldest once the buffer's full
@@ -281,48 +265,6 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     });
     ctx.stroke();   // actually paint the line
   }
-
-  // ============================================================
-  // DEMO MODE - fakes data so the page can be tested/styled without
-  // any ESP32 hardware plugged in.
-  //
-  // TO REMOVE: delete this whole block (down to "END DEMO MODE") plus
-  // the <button id="demoBtn"> up in the markup. The
-  // `typeof stopDemo === 'function'` check in connect() will then just
-  // silently do nothing, no other changes needed.
-  // ============================================================
-  const demoBtn = document.getElementById('demoBtn');
-  let demoTimer = null;   // setInterval ID, so we can cancel it later
-
-  function startDemo() {
-    if (ws) { ws.close(); ws = null; }   // don't let real data fight fake data
-    setStatus(true, 'Demo mode (synthetic data)');
-
-    let t = 0;
-    if (demoTimer) clearInterval(demoTimer);   // stop any previous run first
-
-    // fires every 500ms until cleared. Math.sin gives a smooth wave so
-    // it looks like a plausible live signal rather than random noise.
-    demoTimer = setInterval(() => {
-      t += 0.5;
-      const v = 14 + Math.sin(t / 4) * 1.2;                       // stays in the 12.6-15.4V supply range
-      const p = 4 + Math.sin(t / 2) * 2.4 + Math.random() * 0.4;  // stays under the 7.5VA max
-      const i = (p / v) * 1000;   // mA, stays under the 595mA max
-      updateReading(v, i, p);
-    }, 500);
-  }
-
-  function stopDemo() {
-    if (demoTimer) {
-      clearInterval(demoTimer);
-      demoTimer = null;
-    }
-  }
-
-  demoBtn.addEventListener('click', startDemo);
-  // ============================================================
-  // END DEMO MODE
-  // ============================================================
 
   connect();   // nothing to enter, no button to press - go straight to live data
 </script>

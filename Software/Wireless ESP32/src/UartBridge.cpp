@@ -25,17 +25,26 @@ void UartBridge::poll() {
   }
 }
 
-// Expects "voltage,current,power" as a CSV line. Update this if the
+// Expects "voltage,current,power,phase" as a CSV line. Update this if the
 // ATmega ever changes what it sends.
 void UartBridge::handleLine(const String& line) {
-  // Find the two commas so we can slice the string into 3 fields.
+  // Find the commas so we can slice the string into 4 fields.
   int c1 = line.indexOf(',');
   int c2 = line.indexOf(',', c1 + 1);
   if (c1 < 0 || c2 < 0) return;  // malformed frame, just drop it
+  int c3 = line.indexOf(',', c2 + 1);   // -1 if there's no 4th (phase) field
 
   last_.voltage = line.substring(0, c1).toFloat();
   last_.current = line.substring(c1 + 1, c2).toFloat();
-  last_.power   = line.substring(c2 + 1).toFloat();
+  if (c3 < 0) {
+    // Old 3-field frame with no phase on the end (e.g. the UART test
+    // firmware) - still accept it, phase just shows as 0.
+    last_.power = line.substring(c2 + 1).toFloat();
+    last_.phase = 0;
+  } else {
+    last_.power = line.substring(c2 + 1, c3).toFloat();
+    last_.phase = line.substring(c3 + 1).toFloat();
+  }
   last_.millisAtFrame = millis();   // stamp it so isConnected()/timeout logic works
 
   // Tell whoever's listening (main.cpp) that a new reading is ready.
