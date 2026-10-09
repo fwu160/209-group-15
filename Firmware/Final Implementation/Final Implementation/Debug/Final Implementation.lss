@@ -23,11 +23,11 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING
   9 .debug_frame  00000408  00000000  00000000  000042e4  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000006e7  00000000  00000000  000046ec  2**0
+ 10 .debug_str    00000705  00000000  00000000  000046ec  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000cf4  00000000  00000000  00004dd3  2**0
+ 11 .debug_loc    00000cf4  00000000  00000000  00004df1  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000130  00000000  00000000  00005ac7  2**0
+ 12 .debug_ranges 00000130  00000000  00000000  00005ae5  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -988,7 +988,7 @@ capture_result_t capture_phase_locked(volatile uint16_t *v_buffer, volatile uint
      5f8:	eb 01       	movw	r28, r22
 	// if capture_one_burst for v fails it returns 0, then return CAPTURE_ERR_NO_ZC_V error code
 	if (!capture_one_burst(v_buffer, ADC_CHANNEL_V)) {
-     5fa:	60 e0       	ldi	r22, 0x00	; 0
+     5fa:	61 e0       	ldi	r22, 0x01	; 1
      5fc:	0e 94 d8 02 	call	0x5b0	; 0x5b0 <capture_one_burst>
      600:	88 23       	and	r24, r24
      602:	41 f0       	breq	.+16     	; 0x614 <capture_phase_locked+0x20>
@@ -998,7 +998,7 @@ capture_result_t capture_phase_locked(volatile uint16_t *v_buffer, volatile uint
 	// if capture_one_burst for i fails it returns 0, then return CAPTURE_ERR_NO_ZC_I error code
 
 	if (!capture_one_burst(i_buffer, ADC_CHANNEL_I)) {
-     604:	61 e0       	ldi	r22, 0x01	; 1
+     604:	60 e0       	ldi	r22, 0x00	; 0
      606:	ce 01       	movw	r24, r28
      608:	0e 94 d8 02 	call	0x5b0	; 0x5b0 <capture_one_burst>
      60c:	81 11       	cpse	r24, r1
