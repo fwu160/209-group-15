@@ -12,20 +12,36 @@
 #include "common.h"
 
 typedef struct {
-	float   vrms;      // volts, RMS 
-	float   irms;      // amps, RMS, technically not needed but easy to calc so might be useful later
-	float   ipeak_ma;  // milliamps, peak
-	float   power;     // watts, real power
+	float   vrms;      // Volts, RMS 
+	float   irms;      // Amps, RMS, technically not needed but easy to calc so might be useful later
+	float   ipeak_ma;  // Milliamps, peak
+	float   power;     // Watts, real power
+	float   phase_deg; // Degrees, phase difference between voltage and current 
 	uint8_t clipped;    // 1 if any raw sample hit 0 or 1023 - result is unreliable
 } power_result_t;
 
-// Takes the two raw ADC-count buffers from one phase-locked capture
-// and fills `result` with real-world Vrms, Irms, peak current, and
-// real power. Pure computation - no register access, no hardware
-// dependency, no state carried between calls - so it can be compiled
-// and tested on a PC as well as on the AVR.
+/* 
+Takes the two raw ADC-count buffers from one phase-locked capture
+and fills result with Vrms, Irms, peak current, real power and phase angle. 
+*/ 
 void power_calc_run(const uint16_t *v_buf, const uint16_t *i_buf, power_result_t *result);
 
+//How many samples from start to end of a buffer that make up a whole number of cycles 
+uint16_t whole_cycle_samples(const uint16_t *v_buf);
+
+// running average of several captures
+typedef struct {
+	float   vrms_sum;
+	float   irms_sum;
+	float   ipeak_ma_sum;
+	float   power_sum;
+	uint8_t count;      // how many captures have been added since the last reset
+	uint8_t clipped;    // 1 if ANY of them clipped
+} power_avg_t;
+
+void power_avg_reset(power_avg_t *avg);                                  // Empty power avg (after each UART frame)
+void power_avg_add(power_avg_t *avg, const power_result_t *one);         // Add one capture result to power avg
+void power_avg_get(const power_avg_t *avg, power_result_t *result);     // The average (only call if count > 0)
 
 
 
