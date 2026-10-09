@@ -942,24 +942,24 @@ static uint8_t capture_one_burst(volatile uint16_t *buffer, uint8_t channel)
      5b8:	0e 94 e2 00 	call	0x1c4	; 0x1c4 <adc_select_channel>
 	timer1_reset();
      5bc:	0e 94 b5 03 	call	0x76a	; 0x76a <timer1_reset>
-	adc_start_capture(buffer, N_SAMPLES);  // start adc capture
+	adc_start_capture(buffer, N_SAMPLES);	// Start adc capture
      5c0:	68 ec       	ldi	r22, 0xC8	; 200
      5c2:	70 e0       	ldi	r23, 0x00	; 0
      5c4:	ce 01       	movw	r24, r28
      5c6:	0e 94 f5 00 	call	0x1ea	; 0x1ea <adc_start_capture>
 
-	if (!zc_wait_for_edge()) {          // real INT0 interrupt underneath; timer1_start()
+	if (!zc_wait_for_edge()) {		// Real INT0 interrupt underneath; timer1_start()
      5ca:	0e 94 f4 03 	call	0x7e8	; 0x7e8 <zc_wait_for_edge>
      5ce:	c8 2f       	mov	r28, r24
      5d0:	81 11       	cpse	r24, r1
      5d2:	03 c0       	rjmp	.+6      	; 0x5da <capture_one_burst+0x2a>
-		adc_stop();                     // already happened inside that ISR if it succeeded
+		adc_stop();					// already happened inside that ISR if it succeeded
      5d4:	0e 94 14 01 	call	0x228	; 0x228 <adc_stop>
 		return 0;
      5d8:	09 c0       	rjmp	.+18     	; 0x5ec <capture_one_burst+0x3c>
 	}
-	// block loop here to wait for adc burst to finish, might need to remove if main would need to do something 
-	// but burst capture should have number 1 priorty as accuracy is most important 
+	// Block loop here to wait for adc burst to finish, might need to remove if main would need to do something 
+	// but burst capture should have number 1 priority as accuracy is most important 
 	while (!adc_capture_done()) {
      5da:	0e 94 11 01 	call	0x222	; 0x222 <adc_capture_done>
      5de:	88 23       	and	r24, r24
@@ -986,7 +986,7 @@ capture_result_t capture_phase_locked(volatile uint16_t *v_buffer, volatile uint
      5f4:	cf 93       	push	r28
      5f6:	df 93       	push	r29
      5f8:	eb 01       	movw	r28, r22
-	// if capture_one_burst for v fails it returns 0, then return CAPTURE_ERR_NO_ZC_V error code
+	// If capture_one_burst for v fails it returns 0, then return CAPTURE_ERR_NO_ZC_V error code
 	if (!capture_one_burst(v_buffer, ADC_CHANNEL_V)) {
      5fa:	61 e0       	ldi	r22, 0x01	; 1
      5fc:	0e 94 d8 02 	call	0x5b0	; 0x5b0 <capture_one_burst>
@@ -995,7 +995,7 @@ capture_result_t capture_phase_locked(volatile uint16_t *v_buffer, volatile uint
 		return CAPTURE_ERR_NO_ZC_V;
 	}
 	
-	// if capture_one_burst for i fails it returns 0, then return CAPTURE_ERR_NO_ZC_I error code
+	// If capture_one_burst for i fails it returns 0, then return CAPTURE_ERR_NO_ZC_I error code
 
 	if (!capture_one_burst(i_buffer, ADC_CHANNEL_I)) {
      604:	60 e0       	ldi	r22, 0x00	; 0
@@ -1009,7 +1009,7 @@ capture_result_t capture_phase_locked(volatile uint16_t *v_buffer, volatile uint
 
 capture_result_t capture_phase_locked(volatile uint16_t *v_buffer, volatile uint16_t *i_buffer)
 {
-	// if capture_one_burst for v fails it returns 0, then return CAPTURE_ERR_NO_ZC_V error code
+	// If capture_one_burst for v fails it returns 0, then return CAPTURE_ERR_NO_ZC_V error code
 	if (!capture_one_burst(v_buffer, ADC_CHANNEL_V)) {
 		return CAPTURE_ERR_NO_ZC_V;
      614:	81 e0       	ldi	r24, 0x01	; 1
@@ -1223,7 +1223,7 @@ void timer1_init(void){
 	OCR1B = TIMER1_TOP;		// Needed since ADC only has a Timer/Counter1 Compare Match B trigger source 
      744:	90 93 8b 00 	sts	0x008B, r25	; 0x80008b <__TEXT_REGION_LENGTH__+0x7f808b>
      748:	80 93 8a 00 	sts	0x008A, r24	; 0x80008a <__TEXT_REGION_LENGTH__+0x7f808a>
-	TIMSK1 = 0b00000000;	// no interrupts set 
+	TIMSK1 = 0b00000000;	// No interrupts set 
      74c:	10 92 6f 00 	sts	0x006F, r1	; 0x80006f <__TEXT_REGION_LENGTH__+0x7f806f>
      750:	08 95       	ret
 
@@ -1233,7 +1233,7 @@ void timer1_init(void){
 
 // function to start timer1
 void timer1_start(void){
-	TCCR1B |= (1<<CS10);	// set CS1 bits to 001, prescaler of 1 set (no prescaling)
+	TCCR1B |= (1<<CS10);	// Set CS1 bits to 001, prescaler of 1 set (no prescaling)
      752:	e1 e8       	ldi	r30, 0x81	; 129
      754:	f0 e0       	ldi	r31, 0x00	; 0
      756:	80 81       	ld	r24, Z
@@ -1260,10 +1260,10 @@ void timer1_stop(void){
 void timer1_reset(void)
 {	
 	
-	TCNT1 = 0;	//reset timer1 counter to 0
+	TCNT1 = 0;					// Reset timer1 counter to 0
      76a:	10 92 85 00 	sts	0x0085, r1	; 0x800085 <__TEXT_REGION_LENGTH__+0x7f8085>
      76e:	10 92 84 00 	sts	0x0084, r1	; 0x800084 <__TEXT_REGION_LENGTH__+0x7f8084>
-	TIFR1 = (1 << OCF1B);		// clear compare b flag 
+	TIFR1 = (1 << OCF1B);		// Clear compare b flag 
      772:	84 e0       	ldi	r24, 0x04	; 4
      774:	86 bb       	out	0x16, r24	; 22
      776:	08 95       	ret
@@ -1278,7 +1278,7 @@ void uart_init(uint16_t ubrr) {
      778:	90 93 c5 00 	sts	0x00C5, r25	; 0x8000c5 <__TEXT_REGION_LENGTH__+0x7f80c5>
      77c:	80 93 c4 00 	sts	0x00C4, r24	; 0x8000c4 <__TEXT_REGION_LENGTH__+0x7f80c4>
 	
-	UCSR0A = 0x00;							// nothing needs to be set
+	UCSR0A = 0x00;							// Nothing needs to be set
      780:	10 92 c0 00 	sts	0x00C0, r1	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7f80c0>
 	UCSR0B |= (1 << TXEN0);					// Enable Transmitter
      784:	e1 ec       	ldi	r30, 0xC1	; 193
@@ -1351,17 +1351,17 @@ void uart_transmit_string(char* message){
 static volatile uint8_t zc_flag = 0;
 
 
-// one-time setup: configure INT0 for a rising edge
+// Configure INT0 for a rising edge
 void zc_init(void){			
-	DDRD |= (1<<2);	// set PD2 as input as this is the INT0 pin 		
+	DDRD &= ~ (1<<DDD2);			// Set PD2 as input, INT0 pin 	
      7d0:	8a b1       	in	r24, 0x0a	; 10
-     7d2:	84 60       	ori	r24, 0x04	; 4
+     7d2:	8b 7f       	andi	r24, 0xFB	; 251
      7d4:	8a b9       	out	0x0a, r24	; 10
-	EIMSK |= (1<<INT0);			// enable INT0 external interrupt 
+	EIMSK |= (1<<INT0);				// Enable INT0 external interrupt 
      7d6:	8d b3       	in	r24, 0x1d	; 29
      7d8:	81 60       	ori	r24, 0x01	; 1
      7da:	8d bb       	out	0x1d, r24	; 29
-	EICRA |= (1<<ISC01)|(1<<ISC00); // set interrupt to be rising edge ISC bits => 11
+	EICRA |= (1<<ISC01)|(1<<ISC00);	// Set interrupt to be rising edge ISC bits => 11
      7dc:	e9 e6       	ldi	r30, 0x69	; 105
      7de:	f0 e0       	ldi	r31, 0x00	; 0
      7e0:	80 81       	ld	r24, Z
@@ -1370,40 +1370,40 @@ void zc_init(void){
      7e6:	08 95       	ret
 
 000007e8 <zc_wait_for_edge>:
-// used by capture file to make sure both V and I bursts are taken from the relative same point on the V wave
+// Used by capture file to make sure both V and I bursts are taken from the relative same point on the V wave
 uint8_t zc_wait_for_edge(void)
 {
 	uint16_t timeout = ZC_TIMEOUT_LOOPS;
 
-	zc_flag = 0;             // reset the "did an edge happen" flag
+	zc_flag = 0;             // Reset the "did an edge happen" flag
      7e8:	10 92 2b 04 	sts	0x042B, r1	; 0x80042b <zc_flag>
-	EIFR  = (1 << INTF0);    // clear any STALE pending edge from before we were ready
+	EIFR  = (1 << INTF0);    // Clear any STALE pending edge from before we were ready
      7ec:	81 e0       	ldi	r24, 0x01	; 1
      7ee:	8c bb       	out	0x1c, r24	; 28
-	EIMSK |= (1 << INT0);    // turn on INT0 interput  
+	EIMSK |= (1 << INT0);    // Turn on INT0 interrupt  
      7f0:	8d b3       	in	r24, 0x1d	; 29
      7f2:	81 60       	ori	r24, 0x01	; 1
      7f4:	8d bb       	out	0x1d, r24	; 29
 }
 
-// used by capture file to make sure both V and I bursts are taken from the relative same point on the V wave
+// Used by capture file to make sure both V and I bursts are taken from the relative same point on the V wave
 uint8_t zc_wait_for_edge(void)
 {
 	uint16_t timeout = ZC_TIMEOUT_LOOPS;
      7f6:	80 e2       	ldi	r24, 0x20	; 32
      7f8:	9e e4       	ldi	r25, 0x4E	; 78
-	zc_flag = 0;             // reset the "did an edge happen" flag
-	EIFR  = (1 << INTF0);    // clear any STALE pending edge from before we were ready
-	EIMSK |= (1 << INT0);    // turn on INT0 interput  
+	zc_flag = 0;             // Reset the "did an edge happen" flag
+	EIFR  = (1 << INTF0);    // Clear any STALE pending edge from before we were ready
+	EIMSK |= (1 << INT0);    // Turn on INT0 interrupt  
 	
-	// loop that just checks if either zc flag is 0 or still time left before timeout, continue the block loop
+	// Loop that just checks if either zc flag is 0 or still time left before timeout, continue the block loop
 	while (!zc_flag && --timeout) {
      7fa:	20 91 2b 04 	lds	r18, 0x042B	; 0x80042b <zc_flag>
      7fe:	21 11       	cpse	r18, r1
      800:	02 c0       	rjmp	.+4      	; 0x806 <__DATA_REGION_LENGTH__+0x6>
      802:	01 97       	sbiw	r24, 0x01	; 1
      804:	d1 f7       	brne	.-12     	; 0x7fa <zc_wait_for_edge+0x12>
-		// just sit here
+		;	
 	}
 
 	
@@ -1411,14 +1411,14 @@ uint8_t zc_wait_for_edge(void)
      806:	80 91 2b 04 	lds	r24, 0x042B	; 0x80042b <zc_flag>
      80a:	81 11       	cpse	r24, r1
      80c:	04 c0       	rjmp	.+8      	; 0x816 <__DATA_REGION_LENGTH__+0x16>
-		EIMSK &= ~(1 << INT0);   // gave up - disarm so a late edge is ignored
+		EIMSK &= ~(1 << INT0);   // Gave up - disarm so a late edge is ignored
      80e:	9d b3       	in	r25, 0x1d	; 29
      810:	9e 7f       	andi	r25, 0xFE	; 254
      812:	9d bb       	out	0x1d, r25	; 29
-		return 0;                // failure: no signal
+		return 0;                // No signal
      814:	08 95       	ret
 	}
-	return 1;                    // success: a real edge was seen
+	return 1;                    // Real edge was seen
      816:	81 e0       	ldi	r24, 0x01	; 1
 }
      818:	08 95       	ret
@@ -1444,11 +1444,11 @@ ISR(INT0_vect)
      836:	bf 93       	push	r27
      838:	ef 93       	push	r30
      83a:	ff 93       	push	r31
-	// start timer1, will be used to set adc sampling frequency 
-	timer1_start();
+	
+	timer1_start();		// Start timer1, will be used to set adc sampling frequency 
      83c:	0e 94 a9 03 	call	0x752	; 0x752 <timer1_start>
 	
-	// gnore any further edges until zc_wait_for_edge() calls this again for the next burst.
+	// Ignore any further edges until zc_wait_for_edge() calls this again for the next burst.
 	
 	EIMSK &= (uint8_t)~(1 << INT0);
      840:	8d b3       	in	r24, 0x1d	; 29

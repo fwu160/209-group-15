@@ -12,7 +12,7 @@
 void uart_init(uint16_t ubrr) {
 	UBRR0 = ubrr; 
 	
-	UCSR0A = 0x00;							// nothing needs to be set
+	UCSR0A = 0x00;							// Nothing needs to be set
 	UCSR0B |= (1 << TXEN0);					// Enable Transmitter
 	UCSR0C = (1 << UCSZ01) | (1 << UCSZ00);	// Frame format: Async, No Parity, 1 Stop Bit, 8 Data Bits (UCSZ02 in UCSR0B defaults to 0)
 }
