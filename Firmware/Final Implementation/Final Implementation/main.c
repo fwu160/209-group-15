@@ -23,6 +23,7 @@
 #define   RMSVoltage     14.5
 #define   PeakCurrent    125
 #define   Power          1.60
+
  
 static uint16_t v_buf[N_SAMPLES];
 static uint16_t i_buf[N_SAMPLES];
