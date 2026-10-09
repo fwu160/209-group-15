@@ -19,11 +19,11 @@ static volatile uint8_t   capture_done_flag;
 
 void adc_init(void)
 {
-	ADMUX =0;				// clear all mux bits to 0 
-	ADMUX |= (1<<REFS0);	// Vref to 5V Vcc
-	ADCSRA |= (1<<ADPS1)|(1<<ADPS0);	// set to prescaler of 8, should get 125kHz from 2Mhz CPU clk
-	ADCSRA |= (1<<ADEN);	// enable adc peripheral
-	ADCSRA |= (1<<ADSC);	// do a dummy coversion to warm up peripheral  
+	ADMUX = 0;							// Clear all mux bits to 0 
+	ADMUX |= (1<<REFS0);				// Vref to 5V Vcc
+	ADCSRA |= (1<<ADPS1)|(1<<ADPS0);	// Set to prescaler of 8, should get 250kHz from 2Mhz CPU clk
+	ADCSRA |= (1<<ADEN);				// Enable adc peripheral
+	ADCSRA |= (1<<ADSC);				// Do a dummy conversion to warm up peripheral  
 	
 }
 
@@ -76,9 +76,11 @@ ISR(ADC_vect)
 	// no Timer1 interrupts set so thats why we need to manually clear it every time with = (NOT |= since in datasheet it says set 1 to clear so using |= could acidentally clear other flags in reg)
 	TIFR1 = (1 << OCF1B);
 	
-	// stores ADC value in given capture array 
-	capture_buffer[capture_index] = ADC;
-	capture_index++;
+	// stores ADC value in given capture array, overflows are handled 
+	if (capture_index < capture_n) {
+		capture_buffer[capture_index] = ADC;
+		capture_index++;
+	}
 
 	// If capture index reaches given array size, stop adding and set the capture done flag to 1 to let function know burst capture is done
 	if (capture_index >= capture_n) {
