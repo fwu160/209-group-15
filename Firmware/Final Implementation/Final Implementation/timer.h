@@ -12,7 +12,7 @@
 #include "common.h"
 
 // Timer0: Display
-
+void timer0_init(void);
 // Timer1: ADC 
 void timer1_init(void);		// CTC mode, TOP = TIMER1_TOP, left stopped
 void timer1_start(void);	// function to start timer1 

@@ -12,6 +12,7 @@
 
 
 #include "common.h"
+#include "display.h"
 #include "timer.h"
 #include "adc.h"
 #include "zerocross.h"
@@ -58,12 +59,16 @@ int main(void)
 	
 	DDRB |= (1 << 5); // pb5 is debug pin
 	power_avg_t avg;          // running average of the captures since the last UART frame
+	float last_power = 0; 
+	uint8_t frames = 0;
 	
 	timer1_init();
 	timer2_init();   
 	adc_init();
 	zc_init();
 	uart_init(UBRR); // Initiate uart
+	display_init();               
+	display_set_brightness(50); 
 	power_avg_reset(&avg);
 
 	sei();   // enable global interrupts once every module above is configured
@@ -80,10 +85,11 @@ int main(void)
 			power_calc_run(v_buf, i_buf, &one);   // whole cycles only (inside the calculation)
 			power_avg_add(&avg, &one);            // add to the running average - no sending here any more
 			
-			PORTB ^= (1 << PORTB5);   // one toggle per good capture
-			} else {
-			PORTB ^= (1 << PORTB5);   // double-pulse = timed out
-			PORTB ^= (1 << PORTB5);
+			PINB = (1 << PINB5);  // one toggle per good capture
+		} 
+		else{
+			PINB = (1 << PINB5);   // double-pulse = timed out
+			PINB = (1 << PINB5);
 		}
 		
 		// Timer2 says the report period is up -> send the average of everything captured since the last frame
@@ -92,11 +98,21 @@ int main(void)
 				power_result_t p;
 				power_avg_get(&avg, &p);
 				send_results(&p);
-				} else {
+				last_power = p.power;               
+				} 
+			else {
 				// no good capture this period (no zero crossing seen). Send all zeros so the ESP32
-				// still gets a frame - "0.0,0,0.00,0.0" on the dashboard means UART is fine but there is no zero-cross signal.
 				uart_transmit_string("0.0,0,0.00,0.0\r\n");
-				}
+				last_power = 0;                  
+
+			}
+			
+			frames++;
+			if (frames >= 2) {
+				frames = 0;
+				display_show_power(last_power);
+			}
+			
 		power_avg_reset(&avg);    // start a fresh average for the next period
 		}
     }

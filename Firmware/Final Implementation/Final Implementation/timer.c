@@ -8,6 +8,18 @@
 #include "timer.h"
 #include <avr/interrupt.h>
 
+// Fast PWM with TOP = OCR0A (mode 7), clk/64.
+// OC0B is connected to display OE pin, set high at count 0, cleared low at OCR0B.
+void timer0_init(void){
+
+	OCR0A  = 79;
+	TCCR0A = (1 << WGM01) | (1 << WGM00);
+	TCCR0B = (1 << WGM02) | (1 << CS01) | (1 << CS00);
+	TIMSK0 = (1 << TOIE0); 
+}
+
+
+
 // CTC mode, TOP = TIMER1_TOP, left stopped
 void timer1_init(void){
 	TCCR1B |= (1<<WGM12);	// CTC mode set WGM bits 0100

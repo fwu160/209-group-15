@@ -8,6 +8,8 @@ calculation.c
 
 capture.c
 
+display.c
+
 main.c
 
 timer.c

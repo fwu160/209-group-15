@@ -93,9 +93,9 @@ void power_calc_run(const uint16_t *v_buf, const uint16_t *i_buf, power_result_t
 		uint16_t offset_i = (uint16_t)(sum_i / n);
 		
 		
-		int32_t  sum_v2 = 0;		// Running sum of (v-deviation)^2
-		int32_t  sum_i2 = 0;		// Running sum of (i-deviation)^2
-		int32_t  sum_vi = 0;		// Running sum of (v-deviation * i-deviation)
+		int32_t  sum_v2 = 0;		// Sum of (v-deviation)^2
+		int32_t  sum_i2 = 0;		// Sum of (i-deviation)^2
+		int32_t  sum_vi = 0;		// Sum of (v-deviation * i-deviation)
 		uint16_t peak_i_adc = 0; // largest |i-deviation| seen so far (adc count, not converted)
 		
 		uint8_t  clipped = 0;		// flag to check if adc values at rail (it should never be at rail due to the conditioning done to signal)
