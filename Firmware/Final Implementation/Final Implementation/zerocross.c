@@ -13,10 +13,9 @@
 static volatile uint8_t zc_flag = 0;
 
 
-// Configure INT0 for a rising edge
+// Rising edge, but INT0 stays off until zc_wait_for_edge() otherwise an early edge could start timer1 too soon
 void zc_init(void){			
 	DDRD &= ~ (1<<DDD2);			// Set PD2 as input, INT0 pin 	
-	EIMSK |= (1<<INT0);				// Enable INT0 external interrupt 
 	EICRA |= (1<<ISC01)|(1<<ISC00);	// Set interrupt to be rising edge ISC bits => 11
 }
 

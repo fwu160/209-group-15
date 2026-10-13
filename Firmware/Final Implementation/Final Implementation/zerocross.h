@@ -8,6 +8,7 @@
 
 #ifndef ZEROCROSS_H_
 #define ZEROCROSS_H_
+#include "common.h"
 
 void zc_init(void);          // one-time setup: configure INT0 for a rising edge
 
