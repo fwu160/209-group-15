@@ -23,10 +23,10 @@ void printReadingOverUsb(const Reading& r) {
 }
 
 // Runs whenever uartBridge finishes parsing a new frame from the ATmega.
-// Just fans it out to both outputs.
+// Sends it straight to the dashboard (every 0.5 s)
+// USB printing happens once a second in loop() instead
 void onNewReading(const Reading& r) {
   telemetryServer.broadcast(r);
-  printReadingOverUsb(r);
 }
 
 // True if the ATmega's sent a frame recently, i.e. it's actually alive
@@ -88,4 +88,15 @@ void setup() {
 void loop() {
   uartBridge.poll();      // check for new UART data from the ATmega
   telemetryServer.loop(); // WebSocket/DNS housekeeping + heartbeat
+
+  // Print the latest reading over USB once a second
+  // Only while the ATmega is sending, stops 2.5 s after the frames stop
+  static unsigned long lastUsbPrintMs = 0;   // Static so it keeps its value between loop() runs
+  if (millis() - lastUsbPrintMs >= 1000) {
+    lastUsbPrintMs = millis();
+    if (isAtmegaConnected()) {
+      printReadingOverUsb(uartBridge.lastReading());
+    }
+  }
+  
 }

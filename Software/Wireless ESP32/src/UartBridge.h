@@ -13,7 +13,7 @@ struct Reading {
 // Callback type - gets called every time we finish parsing a new reading.
 using ReadingCallback = void (*)(const Reading&);
 
-// Listens on a UART port for lines like "14.0,505,4.99,36.9" and turns
+// Listens on a UART port for lines like "13.81,654,5.54,27.73" and turns
 // them into Reading structs. Non-blocking, just call poll() every loop().
 class UartBridge {
 public:

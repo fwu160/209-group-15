@@ -36,10 +36,9 @@ namespace Config {
   constexpr int ATMEGA_RX_PIN = 16;   // ESP RX2 <- ATmega TXD (through voltage divider, 5V->3.3V)
   constexpr int ATMEGA_TX_PIN = -1; // 17;   // ESP TX2 -> ATmega RXD (we don't actually send anything back)
 
-  // How long we wait without a new frame before deciding the ATmega has
-  // dropped off. This is what feeds UartBridge::isConnected() and drives
-  // the Connected/Disconnected dot on the dashboard. ATmega sends ~once
-  // a second, so 2.5s gives a bit of slack without being slow to notice.
+  // How long without a frame before we decide the ATmega has dropped off
+  // Used by UartBridge::isConnected() for the status dot and the USB printing
+  // ATmega sends every 0.5 s, so 2.5 s is plenty of slack
   constexpr unsigned long ATMEGA_TIMEOUT_MS = 2500;
 
 }
