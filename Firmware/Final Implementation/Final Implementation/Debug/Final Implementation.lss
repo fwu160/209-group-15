@@ -13,21 +13,21 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00001f90  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 00000210  00000000  00000000  00001fd0  2**0
+  5 .debug_aranges 000001f0  00000000  00000000  00001fd0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000023cb  00000000  00000000  000021e0  2**0
+  6 .debug_info   00002082  00000000  00000000  000021c0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00001128  00000000  00000000  000045ab  2**0
+  7 .debug_abbrev 000010b4  00000000  00000000  00004242  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00001302  00000000  00000000  000056d3  2**0
+  8 .debug_line   000011dd  00000000  00000000  000052f6  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000006b8  00000000  00000000  000069d8  2**2
+  9 .debug_frame  000005bc  00000000  00000000  000064d4  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000a85  00000000  00000000  00007090  2**0
+ 10 .debug_str    00000a19  00000000  00000000  00006a90  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00001a67  00000000  00000000  00007b15  2**0
+ 11 .debug_loc    0000169a  00000000  00000000  000074a9  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000208  00000000  00000000  0000957c  2**0
+ 12 .debug_ranges 000001e8  00000000  00000000  00008b43  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -40,7 +40,7 @@ Disassembly of section .text:
       10:	0c 94 08 01 	jmp	0x210	; 0x210 <__bad_interrupt>
       14:	0c 94 08 01 	jmp	0x210	; 0x210 <__bad_interrupt>
       18:	0c 94 08 01 	jmp	0x210	; 0x210 <__bad_interrupt>
-      1c:	0c 94 fc 08 	jmp	0x11f8	; 0x11f8 <__vector_7>
+      1c:	0c 94 04 09 	jmp	0x1208	; 0x1208 <__vector_7>
       20:	0c 94 08 01 	jmp	0x210	; 0x210 <__bad_interrupt>
       24:	0c 94 08 01 	jmp	0x210	; 0x210 <__bad_interrupt>
       28:	0c 94 08 01 	jmp	0x210	; 0x210 <__bad_interrupt>
@@ -1935,10 +1935,10 @@ capture_result_t capture_phase_locked(volatile uint16_t *v_buffer, volatile uint
      bde:	08 95       	ret
 
 00000be0 <display_show_fixed>:
+	TCCR0A |= (1 << COM0B1);	// OE pin controlled by pwm 
 }
 
-// Shows a value on the right-most digits with fixed decimals
-// Unused left digits are off, zeros are kept
+// Shows a value on the right-most digits with fixed decimals, unused left digits are off, zeros are kept
 static void display_show_fixed(float value, uint8_t decimals, uint8_t digits)
 {
      be0:	4f 92       	push	r4
@@ -1967,8 +1967,8 @@ static void display_show_fixed(float value, uint8_t decimals, uint8_t digits)
 	float scale = 1.0f;
 	for (uint8_t k = 0; k < decimals; k++) {
      c0c:	10 e0       	ldi	r17, 0x00	; 0
-// Shows a value on the right-most digits with fixed decimals
-// Unused left digits are off, zeros are kept
+
+// Shows a value on the right-most digits with fixed decimals, unused left digits are off, zeros are kept
 static void display_show_fixed(float value, uint8_t decimals, uint8_t digits)
 {
 	// Scale to a whole number, e.g. 14.48 -> 1448
@@ -1993,7 +1993,7 @@ static void display_show_fixed(float value, uint8_t decimals, uint8_t digits)
      c2c:	0e 94 b8 0b 	call	0x1770	; 0x1770 <__mulsf3>
      c30:	4b 01       	movw	r8, r22
      c32:	5c 01       	movw	r10, r24
-// Unused left digits are off, zeros are kept
+// Shows a value on the right-most digits with fixed decimals, unused left digits are off, zeros are kept
 static void display_show_fixed(float value, uint8_t decimals, uint8_t digits)
 {
 	// Scale to a whole number, e.g. 14.48 -> 1448
@@ -2055,8 +2055,8 @@ static void display_show_fixed(float value, uint8_t decimals, uint8_t digits)
      c7a:	32 01       	movw	r6, r4
 	}
 	
-	// Clamp before casting so it can't wrap
-	float scaled = value * scale + 0.5f;	// Add 0.5 to round
+	// Clamp before casting so it can't wrap, round value
+	float scaled = value * scale + 0.5f;
      c7c:	a5 01       	movw	r20, r10
      c7e:	94 01       	movw	r18, r8
      c80:	c3 01       	movw	r24, r6
@@ -2373,7 +2373,7 @@ void display_set_brightness(uint8_t percent)
      e90:	82 1b       	sub	r24, r18
      e92:	88 bd       	out	0x28, r24	; 40
 	
-	TCCR0A |= (1 << COM0B1);	// OE now controled by pwm 
+	TCCR0A |= (1 << COM0B1);	// OE pin controlled by pwm 
      e94:	84 b5       	in	r24, 0x24	; 36
      e96:	80 62       	ori	r24, 0x20	; 32
      e98:	84 bd       	out	0x24, r24	; 36
@@ -2851,7 +2851,7 @@ int main(void)
 		
 		// Timer2 says the report period is up -> send the average of everything captured since the last frame
 		if (timer2_report_due()) {
-    111c:	0e 94 16 09 	call	0x122c	; 0x122c <timer2_report_due>
+    111c:	0e 94 fc 08 	call	0x11f8	; 0x11f8 <timer2_report_due>
     1120:	88 23       	and	r24, r24
     1122:	f1 f2       	breq	.-68     	; 0x10e0 <main+0x52>
 			if (avg.count > 0) {
@@ -2931,7 +2931,7 @@ int main(void)
 
 00001182 <timer0_init>:
 
-// Fast PWM with TOP = OCR0A (mode 7), clk/64
+// Fast PWM 64 prescaler 
 // OC0B is connected to display OE pin, set high at count 0, cleared low at OCR0B
 void timer0_init(void){
 
@@ -2954,18 +2954,18 @@ void timer0_init(void){
 
 // CTC mode, TOP = TIMER1_TOP, left stopped
 void timer1_init(void){
-	TCCR1B |= (1<<WGM12);	// CTC mode set WGM bits 0100
+	TCCR1B |= (1<<WGM12);	// CTC mode
     1196:	e1 e8       	ldi	r30, 0x81	; 129
     1198:	f0 e0       	ldi	r31, 0x00	; 0
     119a:	80 81       	ld	r24, Z
     119c:	88 60       	ori	r24, 0x08	; 8
     119e:	80 83       	st	Z, r24
-	OCR1A = TIMER1_TOP;		// sets the period of the timer, TIMER1_TOP defined in common.h file 
+	OCR1A = TIMER1_TOP;
     11a0:	87 ec       	ldi	r24, 0xC7	; 199
     11a2:	90 e0       	ldi	r25, 0x00	; 0
     11a4:	90 93 89 00 	sts	0x0089, r25	; 0x800089 <__TEXT_REGION_LENGTH__+0x7f8089>
     11a8:	80 93 88 00 	sts	0x0088, r24	; 0x800088 <__TEXT_REGION_LENGTH__+0x7f8088>
-	OCR1B = TIMER1_TOP;		// Needed since ADC only has a Timer/Counter1 Compare Match B trigger source 
+	OCR1B = TIMER1_TOP;		// Needed since ADC only has a timer1 compare match b trigger source 
     11ac:	90 93 8b 00 	sts	0x008B, r25	; 0x80008b <__TEXT_REGION_LENGTH__+0x7f808b>
     11b0:	80 93 8a 00 	sts	0x008A, r24	; 0x80008a <__TEXT_REGION_LENGTH__+0x7f808a>
 	TIMSK1 = 0b00000000;	// No interrupts set 
@@ -2976,9 +2976,9 @@ void timer1_init(void){
 }
 
 
-// function to start timer1
+// Start timer1 1 prescaler (no prescaling occurring)
 void timer1_start(void){
-	TCCR1B |= (1<<CS10);	// Set CS1 bits to 001, prescaler of 1 set (no prescaling)
+	TCCR1B |= (1<<CS10);
     11ba:	e1 e8       	ldi	r30, 0x81	; 129
     11bc:	f0 e0       	ldi	r31, 0x00	; 0
     11be:	80 81       	ld	r24, Z
@@ -2991,7 +2991,7 @@ void timer1_start(void){
 
 
 void timer1_stop(void){
-	TCCR1B &= ~((1 << CS12) | (1 << CS11) | (1 << CS10));	// set CS1 bits to 000, no clk source so timer1 is off
+	TCCR1B &= ~((1 << CS12) | (1 << CS11) | (1 << CS10));
     11c6:	e1 e8       	ldi	r30, 0x81	; 129
     11c8:	f0 e0       	ldi	r31, 0x00	; 0
     11ca:	80 81       	ld	r24, Z
@@ -3000,15 +3000,15 @@ void timer1_stop(void){
     11d0:	08 95       	ret
 
 000011d2 <timer1_reset>:
-}
 
+// Reset timer1 counter to 0, clear compare b flag to reset
 void timer1_reset(void)
 {	
 	
-	TCNT1 = 0;					// Reset timer1 counter to 0
+	TCNT1 = 0;				
     11d2:	10 92 85 00 	sts	0x0085, r1	; 0x800085 <__TEXT_REGION_LENGTH__+0x7f8085>
     11d6:	10 92 84 00 	sts	0x0084, r1	; 0x800084 <__TEXT_REGION_LENGTH__+0x7f8084>
-	TIFR1 = (1 << OCF1B);		// Clear compare b flag 
+	TIFR1 = (1 << OCF1B);	 
     11da:	84 e0       	ldi	r24, 0x04	; 4
     11dc:	86 bb       	out	0x16, r24	; 22
     11de:	08 95       	ret
@@ -3016,72 +3016,73 @@ void timer1_reset(void)
 000011e0 <timer2_init>:
 }
 
-
+// Timer2 CTC mode 1024 prescaler interrupt on compare match A
 void timer2_init(void)
 {
-	TCCR2A = (1 << WGM21);							// CTC mode: count 0..OCR2A then start again (WGM2 bits = 010)
+	TCCR2A = (1 << WGM21);								
     11e0:	82 e0       	ldi	r24, 0x02	; 2
     11e2:	80 93 b0 00 	sts	0x00B0, r24	; 0x8000b0 <__TEXT_REGION_LENGTH__+0x7f80b0>
-	OCR2A  = TIMER2_TOP;							// 194 -> 195 counts per cycle
+	OCR2A  = TIMER2_TOP;						
     11e6:	92 ec       	ldi	r25, 0xC2	; 194
     11e8:	90 93 b3 00 	sts	0x00B3, r25	; 0x8000b3 <__TEXT_REGION_LENGTH__+0x7f80b3>
-	TIMSK2 = (1 << OCIE2A);							// interrupt on compare match A
+	TIMSK2 = (1 << OCIE2A);								
     11ec:	80 93 70 00 	sts	0x0070, r24	; 0x800070 <__TEXT_REGION_LENGTH__+0x7f8070>
-	TCCR2B = (1 << CS22) | (1 << CS21) | (1 << CS20);	// clk/1024 (Timer2's prescaler table: 111 = 1024). This starts the timer.
+	TCCR2B = (1 << CS22) | (1 << CS21) | (1 << CS20);	
     11f0:	87 e0       	ldi	r24, 0x07	; 7
     11f2:	80 93 b1 00 	sts	0x00B1, r24	; 0x8000b1 <__TEXT_REGION_LENGTH__+0x7f80b1>
     11f6:	08 95       	ret
 
-000011f8 <__vector_7>:
+000011f8 <timer2_report_due>:
+
+
+// Main calls this every loop, returns 1 once per report period 
+uint8_t timer2_report_due(void)
+{
+	if (report_flag) {
+    11f8:	80 91 4a 04 	lds	r24, 0x044A	; 0x80044a <report_flag>
+    11fc:	88 23       	and	r24, r24
+    11fe:	19 f0       	breq	.+6      	; 0x1206 <timer2_report_due+0xe>
+		report_flag = 0;	// Clear it so the next call returns 0 until the next period is up
+    1200:	10 92 4a 04 	sts	0x044A, r1	; 0x80044a <report_flag>
+		return 1;
+    1204:	81 e0       	ldi	r24, 0x01	; 1
+	}
+	return 0;
 }
+    1206:	08 95       	ret
+
+00001208 <__vector_7>:
 
 // Runs every 99.84 ms, masked during bursts (see capture.c)
 ISR(TIMER2_COMPA_vect)
 {
-    11f8:	1f 92       	push	r1
-    11fa:	0f 92       	push	r0
-    11fc:	0f b6       	in	r0, 0x3f	; 63
-    11fe:	0f 92       	push	r0
-    1200:	11 24       	eor	r1, r1
-    1202:	8f 93       	push	r24
+    1208:	1f 92       	push	r1
+    120a:	0f 92       	push	r0
+    120c:	0f b6       	in	r0, 0x3f	; 63
+    120e:	0f 92       	push	r0
+    1210:	11 24       	eor	r1, r1
+    1212:	8f 93       	push	r24
 	report_ticks++;
-    1204:	80 91 4b 04 	lds	r24, 0x044B	; 0x80044b <report_ticks>
-    1208:	8f 5f       	subi	r24, 0xFF	; 255
-    120a:	80 93 4b 04 	sts	0x044B, r24	; 0x80044b <report_ticks>
+    1214:	80 91 4b 04 	lds	r24, 0x044B	; 0x80044b <report_ticks>
+    1218:	8f 5f       	subi	r24, 0xFF	; 255
+    121a:	80 93 4b 04 	sts	0x044B, r24	; 0x80044b <report_ticks>
 	if (report_ticks >= TICKS_PER_REPORT) {
-    120e:	80 91 4b 04 	lds	r24, 0x044B	; 0x80044b <report_ticks>
-    1212:	85 30       	cpi	r24, 0x05	; 5
-    1214:	28 f0       	brcs	.+10     	; 0x1220 <__vector_7+0x28>
+    121e:	80 91 4b 04 	lds	r24, 0x044B	; 0x80044b <report_ticks>
+    1222:	85 30       	cpi	r24, 0x05	; 5
+    1224:	28 f0       	brcs	.+10     	; 0x1230 <__vector_7+0x28>
 		report_ticks = 0;
-    1216:	10 92 4b 04 	sts	0x044B, r1	; 0x80044b <report_ticks>
+    1226:	10 92 4b 04 	sts	0x044B, r1	; 0x80044b <report_ticks>
 		report_flag = 1;
-    121a:	81 e0       	ldi	r24, 0x01	; 1
-    121c:	80 93 4a 04 	sts	0x044A, r24	; 0x80044a <report_flag>
+    122a:	81 e0       	ldi	r24, 0x01	; 1
+    122c:	80 93 4a 04 	sts	0x044A, r24	; 0x80044a <report_flag>
 	}
 }
-    1220:	8f 91       	pop	r24
-    1222:	0f 90       	pop	r0
-    1224:	0f be       	out	0x3f, r0	; 63
-    1226:	0f 90       	pop	r0
-    1228:	1f 90       	pop	r1
-    122a:	18 95       	reti
-
-0000122c <timer2_report_due>:
-
-// Main calls this every loop. Returns 1 once per report period (TICKS_PER_REPORT ticks).
-uint8_t timer2_report_due(void)
-{
-	if (report_flag) {
-    122c:	80 91 4a 04 	lds	r24, 0x044A	; 0x80044a <report_flag>
-    1230:	88 23       	and	r24, r24
-    1232:	19 f0       	breq	.+6      	; 0x123a <timer2_report_due+0xe>
-		report_flag = 0;	// Clear it so the next call returns 0 until the next period is up
-    1234:	10 92 4a 04 	sts	0x044A, r1	; 0x80044a <report_flag>
-		return 1;
-    1238:	81 e0       	ldi	r24, 0x01	; 1
-	}
-	return 0;
-    123a:	08 95       	ret
+    1230:	8f 91       	pop	r24
+    1232:	0f 90       	pop	r0
+    1234:	0f be       	out	0x3f, r0	; 63
+    1236:	0f 90       	pop	r0
+    1238:	1f 90       	pop	r1
+    123a:	18 95       	reti
 
 0000123c <uart_init>:
 
@@ -3155,7 +3156,6 @@ void uart_transmit_string(char* message){
 		uart_transmit(message[i]);
 	}
 	
-}
     128a:	df 91       	pop	r29
     128c:	cf 91       	pop	r28
     128e:	1f 91       	pop	r17
@@ -3163,16 +3163,16 @@ void uart_transmit_string(char* message){
     1292:	08 95       	ret
 
 00001294 <zc_init>:
-static volatile uint8_t zc_flag = 0;
 
+static volatile uint8_t zc_flag = 0;
 
 // Rising edge, but INT0 stays off until zc_wait_for_edge() otherwise an early edge could start timer1 too soon
 void zc_init(void){			
-	DDRD &= ~ (1<<DDD2);			// Set PD2 as input, INT0 pin 	
+	DDRD &= ~(1<<DDD2);			
     1294:	8a b1       	in	r24, 0x0a	; 10
     1296:	8b 7f       	andi	r24, 0xFB	; 251
     1298:	8a b9       	out	0x0a, r24	; 10
-	EICRA |= (1<<ISC01)|(1<<ISC00);	// Set interrupt to be rising edge ISC bits => 11
+	EICRA |= (1<<ISC01)|(1<<ISC00);
     129a:	e9 e6       	ldi	r30, 0x69	; 105
     129c:	f0 e0       	ldi	r31, 0x00	; 0
     129e:	80 81       	ld	r24, Z
@@ -3186,12 +3186,12 @@ uint8_t zc_wait_for_edge(void)
 {
 	uint16_t timeout = ZC_TIMEOUT_LOOPS;
 
-	zc_flag = 0;             // Reset the "did an edge happen" flag
+	zc_flag = 0;			// Reset flag
     12a6:	10 92 4c 04 	sts	0x044C, r1	; 0x80044c <zc_flag>
-	EIFR  = (1 << INTF0);    // Clear any STALE pending edge from before we were ready
+	EIFR  = (1 << INTF0);	// Clear any old pending edge from before we were ready
     12aa:	81 e0       	ldi	r24, 0x01	; 1
     12ac:	8c bb       	out	0x1c, r24	; 28
-	EIMSK |= (1 << INT0);    // Turn on INT0 interrupt  
+	EIMSK |= (1 << INT0);     
     12ae:	8d b3       	in	r24, 0x1d	; 29
     12b0:	81 60       	ori	r24, 0x01	; 1
     12b2:	8d bb       	out	0x1d, r24	; 29
@@ -3203,9 +3203,9 @@ uint8_t zc_wait_for_edge(void)
 	uint16_t timeout = ZC_TIMEOUT_LOOPS;
     12b4:	80 e2       	ldi	r24, 0x20	; 32
     12b6:	9e e4       	ldi	r25, 0x4E	; 78
-	zc_flag = 0;             // Reset the "did an edge happen" flag
-	EIFR  = (1 << INTF0);    // Clear any STALE pending edge from before we were ready
-	EIMSK |= (1 << INT0);    // Turn on INT0 interrupt  
+	zc_flag = 0;			// Reset flag
+	EIFR  = (1 << INTF0);	// Clear any old pending edge from before we were ready
+	EIMSK |= (1 << INT0);     
 	
 	// Loop that just checks if either zc flag is 0 or still time left before timeout, continue the block loop
 	while (!zc_flag && --timeout) {
@@ -3217,19 +3217,21 @@ uint8_t zc_wait_for_edge(void)
 		;	
 	}
 
-	
+	// Timed out, return 0 
 	if (!zc_flag) {
     12c4:	80 91 4c 04 	lds	r24, 0x044C	; 0x80044c <zc_flag>
     12c8:	81 11       	cpse	r24, r1
     12ca:	04 c0       	rjmp	.+8      	; 0x12d4 <zc_wait_for_edge+0x2e>
-		EIMSK &= ~(1 << INT0);   // Gave up - disarm so a late edge is ignored
+		EIMSK &= ~(1 << INT0);   
     12cc:	9d b3       	in	r25, 0x1d	; 29
     12ce:	9e 7f       	andi	r25, 0xFE	; 254
     12d0:	9d bb       	out	0x1d, r25	; 29
-		return 0;                // No signal
+		return 0;                
     12d2:	08 95       	ret
 	}
-	return 1;                    // Real edge was seen
+	
+	// Edge found return 0 
+	return 1;	
     12d4:	81 e0       	ldi	r24, 0x01	; 1
 }
     12d6:	08 95       	ret
@@ -3256,16 +3258,12 @@ ISR(INT0_vect)
     12f6:	ef 93       	push	r30
     12f8:	ff 93       	push	r31
 	
-	timer1_start();		// Start timer1, will be used to set adc sampling frequency 
+	timer1_start();							// Start timer1, will be used to set adc sampling frequency 	
     12fa:	0e 94 dd 08 	call	0x11ba	; 0x11ba <timer1_start>
-	
-	// Ignore any further edges until zc_wait_for_edge() calls this again for the next burst.
-	
-	EIMSK &= (uint8_t)~(1 << INT0);
+	EIMSK &= (uint8_t)~(1 << INT0);			// Ignore any further edges until zc_wait_for_edge() calls this again for the next burst_---
     12fe:	8d b3       	in	r24, 0x1d	; 29
     1300:	8e 7f       	andi	r24, 0xFE	; 254
     1302:	8d bb       	out	0x1d, r24	; 29
-	
 	zc_flag = 1;
     1304:	81 e0       	ldi	r24, 0x01	; 1
     1306:	80 93 4c 04 	sts	0x044C, r24	; 0x80044c <zc_flag>

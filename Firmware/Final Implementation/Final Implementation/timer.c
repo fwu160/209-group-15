@@ -12,7 +12,7 @@ static volatile uint8_t report_ticks = 0;	// how many 99.84 ms ticks since the l
 static volatile uint8_t report_flag  = 0;	// set to 1 by the ISR when a report is due
 
 
-// Fast PWM with TOP = OCR0A (mode 7), clk/64
+// Fast PWM 64 prescaler 
 // OC0B is connected to display OE pin, set high at count 0, cleared low at OCR0B
 void timer0_init(void){
 
@@ -24,38 +24,50 @@ void timer0_init(void){
 
 // CTC mode, TOP = TIMER1_TOP, left stopped
 void timer1_init(void){
-	TCCR1B |= (1<<WGM12);	// CTC mode set WGM bits 0100
-	OCR1A = TIMER1_TOP;		// sets the period of the timer, TIMER1_TOP defined in common.h file 
-	OCR1B = TIMER1_TOP;		// Needed since ADC only has a Timer/Counter1 Compare Match B trigger source 
+	TCCR1B |= (1<<WGM12);	// CTC mode
+	OCR1A = TIMER1_TOP;
+	OCR1B = TIMER1_TOP;		// Needed since ADC only has a timer1 compare match b trigger source 
 	TIMSK1 = 0b00000000;	// No interrupts set 
 	
 }
 
 
-// function to start timer1
+// Start timer1 1 prescaler (no prescaling occurring)
 void timer1_start(void){
-	TCCR1B |= (1<<CS10);	// Set CS1 bits to 001, prescaler of 1 set (no prescaling)
+	TCCR1B |= (1<<CS10);
 }	
 
 
 void timer1_stop(void){
-	TCCR1B &= ~((1 << CS12) | (1 << CS11) | (1 << CS10));	// set CS1 bits to 000, no clk source so timer1 is off
+	TCCR1B &= ~((1 << CS12) | (1 << CS11) | (1 << CS10));
 }
 
+// Reset timer1 counter to 0, clear compare b flag to reset
 void timer1_reset(void)
 {	
 	
-	TCNT1 = 0;					// Reset timer1 counter to 0
-	TIFR1 = (1 << OCF1B);		// Clear compare b flag 
+	TCNT1 = 0;				
+	TIFR1 = (1 << OCF1B);	 
+}
+
+// Timer2 CTC mode 1024 prescaler interrupt on compare match A
+void timer2_init(void)
+{
+	TCCR2A = (1 << WGM21);								
+	OCR2A  = TIMER2_TOP;						
+	TIMSK2 = (1 << OCIE2A);								
+	TCCR2B = (1 << CS22) | (1 << CS21) | (1 << CS20);	
 }
 
 
-void timer2_init(void)
+// Main calls this every loop, returns 1 once per report period 
+uint8_t timer2_report_due(void)
 {
-	TCCR2A = (1 << WGM21);							// CTC mode: count 0..OCR2A then start again (WGM2 bits = 010)
-	OCR2A  = TIMER2_TOP;							// 194 -> 195 counts per cycle
-	TIMSK2 = (1 << OCIE2A);							// interrupt on compare match A
-	TCCR2B = (1 << CS22) | (1 << CS21) | (1 << CS20);	// clk/1024 (Timer2's prescaler table: 111 = 1024). This starts the timer.
+	if (report_flag) {
+		report_flag = 0;	// Clear it so the next call returns 0 until the next period is up
+		return 1;
+	}
+	return 0;
 }
 
 // Runs every 99.84 ms, masked during bursts (see capture.c)
@@ -68,12 +80,3 @@ ISR(TIMER2_COMPA_vect)
 	}
 }
 
-// Main calls this every loop. Returns 1 once per report period (TICKS_PER_REPORT ticks).
-uint8_t timer2_report_due(void)
-{
-	if (report_flag) {
-		report_flag = 0;	// Clear it so the next call returns 0 until the next period is up
-		return 1;
-	}
-	return 0;
-}

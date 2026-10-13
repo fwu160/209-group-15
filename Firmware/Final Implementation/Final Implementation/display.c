@@ -8,7 +8,7 @@
 #include <avr/interrupt.h>
 #include "display.h"
 
-static volatile uint8_t disp_characters[4] = {0, 0, 0, 0};  // pattern for each digit, 0 = leftmost
+static volatile uint8_t disp_characters[4] = {0, 0, 0, 0};  // pattern for each digit
 static volatile uint8_t disp_pos = 0;                       // digit lit next
 
 #define SEG_DP  0b10000000      // Bit 7 is the DP
@@ -70,11 +70,10 @@ void display_set_brightness(uint8_t percent)
 	// Setting PWM percentage
 	OCR0B = (TIMER0_TOP - 1) - ((uint16_t)(percent - 1) * (TIMER0_TOP - 1 - DISPLAY_MIN_BLANK)) / 99;
 	
-	TCCR0A |= (1 << COM0B1);	// OE now controled by pwm 
+	TCCR0A |= (1 << COM0B1);	// OE pin controlled by pwm 
 }
 
-// Shows a value on the right-most digits with fixed decimals
-// Unused left digits are off, zeros are kept
+// Shows a value on the right-most digits with fixed decimals, unused left digits are off, zeros are kept
 static void display_show_fixed(float value, uint8_t decimals, uint8_t digits)
 {
 	// Scale to a whole number, e.g. 14.48 -> 1448
@@ -95,8 +94,8 @@ static void display_show_fixed(float value, uint8_t decimals, uint8_t digits)
 		value = 0.0f;
 	}
 	
-	// Clamp before casting so it can't wrap
-	float scaled = value * scale + 0.5f;	// Add 0.5 to round
+	// Clamp before casting so it can't wrap, round value
+	float scaled = value * scale + 0.5f;
 	uint16_t n;
 	if (scaled > max) {
 		n = max;
