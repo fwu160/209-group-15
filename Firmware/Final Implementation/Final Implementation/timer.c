@@ -8,17 +8,19 @@
 #include "timer.h"
 #include <avr/interrupt.h>
 
-// Fast PWM with TOP = OCR0A (mode 7), clk/64.
-// OC0B is connected to display OE pin, set high at count 0, cleared low at OCR0B.
+static volatile uint8_t report_ticks = 0;	// how many 99.84 ms ticks since the last report
+static volatile uint8_t report_flag  = 0;	// set to 1 by the ISR when a report is due
+
+
+// Fast PWM with TOP = OCR0A (mode 7), clk/64
+// OC0B is connected to display OE pin, set high at count 0, cleared low at OCR0B
 void timer0_init(void){
 
-	OCR0A  = 79;
+	OCR0A  = TIMER0_TOP;		
 	TCCR0A = (1 << WGM01) | (1 << WGM00);
 	TCCR0B = (1 << WGM02) | (1 << CS01) | (1 << CS00);
 	TIMSK0 = (1 << TOIE0); 
 }
-
-
 
 // CTC mode, TOP = TIMER1_TOP, left stopped
 void timer1_init(void){
@@ -48,9 +50,6 @@ void timer1_reset(void)
 }
 
 
-static volatile uint8_t report_ticks = 0;	// how many 99.84 ms ticks since the last report
-static volatile uint8_t report_flag  = 0;	// set to 1 by the ISR when a report is due
-
 void timer2_init(void)
 {
 	TCCR2A = (1 << WGM21);							// CTC mode: count 0..OCR2A then start again (WGM2 bits = 010)
@@ -59,7 +58,7 @@ void timer2_init(void)
 	TCCR2B = (1 << CS22) | (1 << CS21) | (1 << CS20);	// clk/1024 (Timer2's prescaler table: 111 = 1024). This starts the timer.
 }
 
-// Runs every 99.84 ms, can interrupt an ADC burst but small enough so it should be fine 
+// Runs every 99.84 ms, masked during bursts (see capture.c)
 ISR(TIMER2_COMPA_vect)
 {
 	report_ticks++;

@@ -54,29 +54,30 @@ void adc_start_capture(volatile uint16_t *buffer, uint16_t n)
 	// ADTS bits = 101 , Timer/Counter1 Compare Match B is the trigger source
 	ADCSRB = (ADCSRB & 0xF8) | (1 << ADTS2) | (0 << ADTS1) | (1 << ADTS0);
 	TIFR1  = (1 << OCF1B);   // clear any leftover/stale flag in timer1 flag reg before the first real trigger
-	// enable auto trigger, enable adc completed interrupt  
-	ADCSRA |= (1 << ADATE) | (1 << ADIE);
+	// enable auto trigger, adc interrupt on, MUST clear conversion finished flag or old readings could be taken 
+	ADCSRA |= (1 << ADIF) | (1 << ADATE) | (1 << ADIE);
+
 }
 
-// return adc burst capture done flag to whatever function is using burst capture 
+// Return adc burst capture done flag to whatever function is using burst capture 
 uint8_t adc_capture_done(void) { 
 	return capture_done_flag; 
-
 }
 
 // stop all ADC interrupts, isnt triggered by timer1 anymore
 void adc_stop(void)
 {
 	ADCSRA &= (uint8_t)~((1 << ADATE) | (1 << ADIE));
+	
+	
 }
 
 ISR(ADC_vect)
 {
-	// Must be cleared every sample, or the ADC stops seeing the NEXT Timer1 compare match as a fresh trigger edge 
-	// no Timer1 interrupts set so thats why we need to manually clear it every time with = (NOT |= since in datasheet it says set 1 to clear so using |= could acidentally clear other flags in reg)
+	// Must be cleared every sample since no timer1 interrupt set, or the ADC stops seeing the next timer1 compare match as a fresh trigger edge 
 	TIFR1 = (1 << OCF1B);
 	
-	// stores ADC value in given capture array, overflows are handled 
+	// Stores ADC value in given capture array, overflows are handled 
 	if (capture_index < capture_n) {
 		capture_buffer[capture_index] = ADC;
 		capture_index++;
