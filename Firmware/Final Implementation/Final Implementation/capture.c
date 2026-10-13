@@ -8,12 +8,15 @@
 #include "timer.h"
 #include "adc.h"
 #include "zerocross.h"
+#include "common.h"
 
 // One burst on one channel, will be used to capture V and I signals from the same relative point (rising zero crossing on V signal)
-static uint8_t capture_one_burst(volatile uint16_t *buffer, uint8_t channel)
+static uint8_t capture_one_burst(volatile uint16_t *buffer, uint8_t channel, uint16_t start_count)
 {
 	adc_select_channel(channel);      
 	timer1_reset();
+	TCNT1 = start_count;        
+
 	adc_start_capture(buffer, N_SAMPLES);	// Start adc capture
 
 	if (!zc_wait_for_edge()) {		// Real INT0 interrupt underneath; timer1_start()
@@ -32,22 +35,24 @@ static uint8_t capture_one_burst(volatile uint16_t *buffer, uint8_t channel)
 }
 
 capture_result_t capture_phase_locked(volatile uint16_t *v_buffer, volatile uint16_t *i_buffer)
-{
+{	
+	capture_result_t result = CAPTURE_OK;		
+
 	TIMSK2 &= (uint8_t)~(1 << OCIE2A);	// hold the Timer2 report tick while sampling 
 
 	// If capture_one_burst for v fails it returns 0, then return CAPTURE_ERR_NO_ZC_V error code
-	if (!capture_one_burst(v_buffer, ADC_CHANNEL_V)) {
-		return CAPTURE_ERR_NO_ZC_V;
+	if (!capture_one_burst(v_buffer, ADC_CHANNEL_V, PHASE_TRIM_CYCLES)) {
+		result = CAPTURE_ERR_NO_ZC_V;	
 	}
 	
 	// If capture_one_burst for i fails it returns 0, then return CAPTURE_ERR_NO_ZC_I error code
 
-	if (!capture_one_burst(i_buffer, ADC_CHANNEL_I)) {
-		return CAPTURE_ERR_NO_ZC_I;
+	else if (!capture_one_burst(i_buffer, ADC_CHANNEL_I, 0)) {
+		result = CAPTURE_ERR_NO_ZC_I;
 	}
 	
 	TIMSK2 |= (1 << OCIE2A); // turn it back on , any uart send flags will run now 
 
 	
-	return CAPTURE_OK;
+	return result;
 }

@@ -42,13 +42,13 @@ when to give up on measurement )
  
 /* Calibration */ 
 #define VOLTS_PER_COUNT  (5.0f / 1024.0f)		// ADC: 5V reference, 10-bit
-#define K_V   0.109922f//(VOLTS_PER_COUNT * 14.1f)			// source volts per count NEED TO CHANGE AFTER CALABRATION
-#define K_I  0.0044047f //(VOLTS_PER_COUNT * 2.0f)			// load amps per count    NEED TO CHANGE AFTER CALABRATION
+#define K_V   0.109922f //(VOLTS_PER_COUNT * 14.1f)			// source volts per count NEED TO CHANGE AFTER CALABRATION
+#define K_I   0.004037f //  0.0044047f //(VOLTS_PER_COUNT * 2.0f)			// load amps per count    NEED TO CHANGE AFTER CALABRATION
+#define PHASE_TRIM_CYCLES   23
 
 // UART send rate
 /* 
-Timer2 runs in CTC mode from the 2 MHz clock / 1024 = 1953.125 Hz,
-so one count = 512 us. Counting 0 ->> 194 (195 counts) = 99.84 ms per
+Timer2 runs in CTC mode, counting 0 ->> 194 (195 counts) = 99.84 ms per
 compare match (which is one tick). A UART frame goes out every TICKS_PER_REPORT ticks.
 
 One capture (V burst + I burst + calculation) takes about 80 ms (in theory) and a
