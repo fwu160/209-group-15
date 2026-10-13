@@ -29,7 +29,7 @@
 static uint16_t v_buf[N_SAMPLES];
 static uint16_t i_buf[N_SAMPLES];
 
-static void send_results(const power_result_t *p)
+static void send_results(const reading_t *p)
 {
 	char num[16];
 
@@ -58,7 +58,7 @@ int main(void)
 	
 	
 	DDRB |= (1 << 5); // pb5 is debug pin
-	power_avg_t avg;          // running average of the captures since the last UART frame
+	reading_sums_t avg;          // running average of the captures since the last UART frame
 	float last_power = 0; 
 	uint8_t frames = 0;
 	
@@ -81,7 +81,7 @@ int main(void)
 
 
 		if (result == CAPTURE_OK) {
-			power_result_t one;
+			reading_t one;
 			power_calc_run(v_buf, i_buf, &one);   // whole cycles only (inside the calculation)
 			power_avg_add(&avg, &one);            // add to the running average - no sending here any more
 			
@@ -95,7 +95,7 @@ int main(void)
 		// Timer2 says the report period is up -> send the average of everything captured since the last frame
 		if (timer2_report_due()) {
 			if (avg.count > 0) {
-				power_result_t p;
+				reading_t p;
 				power_avg_get(&avg, &p);
 				send_results(&p);
 				last_power = p.power;               

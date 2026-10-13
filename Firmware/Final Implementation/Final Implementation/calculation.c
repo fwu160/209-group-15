@@ -9,9 +9,8 @@
 #include "calculation.h"
 
 /*
-Find how many samples make whole cycles, using the voltage samples. 
+Find how many samples make whole cycles, using the voltage samples
 Every time the voltage crosses its middle value going UP, one cycle has passed. The spacing between those crossings is samples per cycle
-
 doing this instead of using interrupts to keep track of what sample count at zero cross since no delays incurred during adc sampling due to interrupts
 */
 
@@ -74,7 +73,7 @@ uint16_t whole_cycle_samples(const uint16_t *v_buf)
 	}
 	return n;
 }
-void power_calc_run(const uint16_t *v_buf, const uint16_t *i_buf, power_result_t *result){
+void power_calc_run(const uint16_t *v_buf, const uint16_t *i_buf, reading_t *result){
 		
 		uint16_t n = whole_cycle_samples(v_buf);
 
@@ -147,21 +146,7 @@ void power_calc_run(const uint16_t *v_buf, const uint16_t *i_buf, power_result_t
 		float mean_vi = (float)sum_vi / (float)n;
 		result->power = mean_vi * K_V * K_I;
 		
-		float apparent_counts = vrms_counts * irms_counts;
-		float power_factor = 1.0f;          // default 0 p.f , therefore if no power factor found then 0 phase 
-		if (apparent_counts > 0.0f) {
-			power_factor = mean_vi / apparent_counts;
-		}
-		
-		// noise can push it outside -1 to 1, and acos of that is not a number
-		if (power_factor > 1.0f) { 
-			power_factor = 1.0f;	// Round to 1 p.f
-		}
-		if (power_factor < -1.0f) {
-			power_factor = -1.0f;	// Round to -1 p.f
-		}
-		
-		result->phase_deg = acosf(power_factor) * 57.29578f;   // Phase diff, convert from rad to deg 
+		result->phase_deg = 0.0f;	// Do phase calc when transmitting, saves calc time
 
 		result->clipped = clipped;	// Clipped flag 
 		
@@ -173,10 +158,11 @@ void power_calc_run(const uint16_t *v_buf, const uint16_t *i_buf, power_result_t
 static float phase_from_power(float power, float vrms, float irms)
 {
 	float apparent = vrms * irms;		// Volt-amps
-	float power_factor = 1.0f;			// Default 1p.f , report 0 degrees if error 
+	float power_factor = 1.0f;			// Default 1 p.f, 0 deg if there's no current
 	if (apparent > 0.0f) {
 		power_factor = power / apparent;
 	}
+	// Noise can push it past +-1, acos would give erorr
 	if (power_factor > 1.0f) {
 		power_factor = 1.0f;
 	}
@@ -186,7 +172,7 @@ static float phase_from_power(float power, float vrms, float irms)
 	return acosf(power_factor) * 57.29578f;	
 }
 
-void power_avg_reset(power_avg_t *avg)
+void power_avg_reset(reading_sums_t *avg)
 {
 	avg->vrms_sum     = 0.0f;
 	avg->irms_sum     = 0.0f;
@@ -196,7 +182,7 @@ void power_avg_reset(power_avg_t *avg)
 	avg->clipped      = 0;
 }
 
-void power_avg_add(power_avg_t *avg, const power_result_t *one)
+void power_avg_add(reading_sums_t *avg, const reading_t *one)
 {
 	avg->vrms_sum     += one->vrms;
 	avg->irms_sum     += one->irms;
@@ -208,7 +194,7 @@ void power_avg_add(power_avg_t *avg, const power_result_t *one)
 	}
 }
 
-void power_avg_get(const power_avg_t *avg, power_result_t *result)
+void power_avg_get(const reading_sums_t *avg, reading_t *result)
 {
 	float n = (float)avg->count;
 
