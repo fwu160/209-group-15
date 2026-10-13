@@ -24,17 +24,17 @@
 #define DS3_BIT      0      // PB0 - digit 3
 #define DS4_BIT      7      // PD7 - digit 4 (rightmost)
 
-#define DISPLAY_TOP	79
-#define DISPLAY_MIN_BLANK 6     // shortest dark part (192 us) so the digit change is always hidden
+#define DISPLAY_MIN_BLANK 6		// Min OCR0B, 224 us dark on each digit change
 
 #define DISPLAY_BRIGHTNESS_DEFAULT  50   // percent, used by display_init()
 
 void display_init(void);                       // call before sei()
 void display_set_brightness(uint8_t percent);  // 0 = off, 1-100 = dim to full
-void display_show_power(float watts);          // shows e.g. " 4.25"
 
 
-
+void display_show_vrms(float volts);		// Shows 14.48
+void display_show_ipeak(float milliamps);	// Shows 192, leftmost off
+void display_show_power(float watts);		// Shows 8.38, leftmost off
 
 
 #endif /* DISPLAY_H_ */
