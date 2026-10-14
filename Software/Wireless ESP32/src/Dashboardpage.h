@@ -1,20 +1,8 @@
 #pragma once
 
-// The dashboard page itself, served directly by the ESP32. The AP's
-// captive portal (see TelemetryServer.cpp) redirects a phone here the
-// second it joins "EnergyMonitor", so it loads on its own - no address
-// to type and nothing to press to connect.
-//
-// This is adapted from clean.html so there's nothing left to configure:
-// it always talks back to whatever host actually served it
-// (location.host), and the Connected/Disconnected indicator now reflects
-// the ATmega's actual UART link (is it toggling around 3.3V or sitting
-// idle at 0V), not just whether the browser's WebSocket happens to be
-// open. That comes from the "c" field TelemetryServer sends with every
-// message.
-//
-// This file is what actually gets served, so keep it as the source of
-// truth if the dashboard gets redesigned again.
+// The dashboard web page, served by the ESP32 (see TelemetryServer.cpp)
+// The captive portal opens it as soon as a phone joins the WiFi
+// The status dot shows if the ATmega is sending, not just if the browser is connected
 const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
 <!doctype html>
 <html lang="en">
@@ -23,7 +11,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Energy Monitor</title>
 <style>
-  /* Colour palette - change these to reskin the whole page */
+  /* Colours, change these to reskin the page */
   :root {
     --bg: #ffffff;
     --border: #e0e0e0;
@@ -41,12 +29,12 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
     padding: 32px 24px 60px;
   }
-  .wrap { max-width: 760px; margin: 0 auto; }   /* centers everything, caps width on big screens */
+  .wrap { max-width: 760px; margin: 0 auto; }   /* Centred, max width on big screens */
 
   h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
   .subtitle { font-size: 13px; color: var(--muted); margin: 0 0 24px; }
 
-  /* top row: status dot pinned right */
+  /* Top bar with the status dot on the right */
   .topbar {
     display: flex;
     align-items: center;
@@ -57,8 +45,6 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     padding: 14px 16px;
     margin-bottom: 24px;
   }
-
-  /* status dot + text, pushed to the right edge via margin-left: auto */
   .status {
     display: flex;
     align-items: center;
@@ -71,11 +57,11 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     width: 10px;
     height: 10px;
     border-radius: 50%;
-    background: var(--offline);   /* red by default, JS flips to green when live */
+    background: var(--offline);   /* Red until JS sets it live */
   }
   .dot.live { background: var(--live); }
 
-  /* 4 meter cards in a row (voltage/current/power/phase) */
+  /* Four reading cards in a row */
   .meters {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -83,9 +69,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     margin-bottom: 14px;
     transition: opacity 0.2s ease;
   }
-  /* Fades the last-known numbers while the ATmega's offline, so it's
-     obvious they're stale and not live. */
-  .meters.offline { opacity: 0.45; }
+  .meters.offline { opacity: 0.45; }   /* Fade old numbers while the ATmega is offline */
   .meter {
     border: 1px solid var(--border);
     border-radius: 8px;
@@ -95,16 +79,38 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   .meter .value { font-size: 30px; font-weight: 600; }
   .meter .unit { font-size: 14px; color: var(--accent); margin-left: 4px; font-weight: 500; }
 
-  /* power-vs-time graph card */
+  /* Graph card */
   .graph {
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 16px 18px 10px;
   }
-  .graph .label { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+  .graph-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .graph .label { font-size: 12px; color: var(--muted); }
   canvas { width: 100%; height: 180px; display: block; }
 
-  /* 2 x 2 grid on small screens instead of squashing 4 cards into one row */
+  /* Buttons to pick what the graph shows */
+  .tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+  .tabs button {
+    font: inherit;
+    font-size: 12px;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 10px;
+    cursor: pointer;
+  }
+  .tabs button.active { color: #fff; background: var(--accent); border-color: var(--accent); }
+
+  /* Cards go 2 x 2 on phones */
   @media (max-width: 640px) {
     .meters { grid-template-columns: repeat(2, 1fr); }
   }
@@ -123,14 +129,14 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     </div>
   </div>
 
-  <!-- the 4 live readouts -->
+  <!-- The 4 live readings -->
   <div class="meters" id="meters">
     <div class="meter">
-      <div class="label">Voltage</div>
+      <div class="label">Voltage (RMS)</div>
       <div class="value" id="vVal">--<span class="unit">V</span></div>
     </div>
     <div class="meter">
-      <div class="label">Current</div>
+      <div class="label">Peak Current</div>
       <div class="value" id="iVal">--<span class="unit">mA</span></div>
     </div>
     <div class="meter">
@@ -144,14 +150,23 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   </div>
 
   <div class="graph">
-    <div class="label">Power, last 60 s</div>
+    <div class="graph-head">
+      <div class="label" id="graphTitle">Power (W), last 60 s</div>
+      <!-- Each data-key matches a field name in the JSON -->
+      <div class="tabs" id="tabs">
+        <button data-key="p" class="active">Power</button>
+        <button data-key="v">Voltage</button>
+        <button data-key="i">Current</button>
+        <button data-key="ph">Phase</button>
+      </div>
+    </div>
     <canvas id="chart" width="720" height="180"></canvas>
   </div>
 
 </div>
 
 <script>
-  // ---- grab all the elements we need up front ----
+  // Grab the elements we need
   const vVal = document.getElementById('vVal');
   const iVal = document.getElementById('iVal');
   const pVal = document.getElementById('pVal');
@@ -159,52 +174,59 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   const metersEl = document.getElementById('meters');
   const statusDot = document.getElementById('statusDot');
   const statusText = document.getElementById('statusText');
+  const graphTitle = document.getElementById('graphTitle');
   const canvas = document.getElementById('chart');
-  const ctx = canvas.getContext('2d');   // 2D drawing API for <canvas>
+  const ctx = canvas.getContext('2d');   // For drawing on the canvas
 
-  let ws = null;            // the active WebSocket (or null if not connected)
-  const history = [];       // Recent readings as {t, p}, newest first
-  let lastT = null;         // ESP32 timestamp of the last frame we plotted
+  let ws = null;            // The WebSocket, null if not connected
+  const history = [];       // Recent readings, newest first
+  let lastT = null;         // Timestamp of the last frame we used
   const WINDOW_MS = 60000;  // Graph shows the last 60 s
   const X_STEP_MS = 10000;  // Gridline every 10 s
-  const GAP_MS = 2000;      // Break the line if frames go missing for this long
-  const MAX_POWER_W = 10;   // Y axis top, max load is ~9 W with a +10% source
-  const Y_STEP_W = 2;       // Gridline every 2 W
+  const GAP_MS = 2000;      // Break the line if frames are missing for this long
 
-  // Updates the dot + text + dims the meters in one call instead of
-  // repeating 3 lines everywhere. `live` means "ATmega is actually
-  // sending UART frames", not just "WebSocket is open".
+  // Y axis settings for each graph, keys match the JSON fields
+  const GRAPHS = {
+    p:  { name: 'Power',         unit: 'W',  max: 10,   step: 2 },
+    v:  { name: 'RMS Voltage',   unit: 'V',  max: 20,   step: 5 },
+    i:  { name: 'Peak Current',  unit: 'mA', max: 1000, step: 200 },
+    ph: { name: 'Phase',         unit: '°',  max: 90,   step: 15 },
+  };
+  let graphKey = 'p';       // What the graph shows now
+
+  // Sets the dot, the text and fades the cards
+  // Live means the ATmega is sending, not just that the WebSocket is open
   function setStatus(live, label) {
     statusDot.classList.toggle('live', live);
     statusText.textContent = label;
     metersEl.classList.toggle('offline', !live);
   }
 
-  // ---- connecting to the ESP32 over WebSocket ----
-  // Page is always served by the ESP32 itself, so it always talks back
-  // to whatever host served it (location.host) - nothing to configure.
-  function connect() {
-    if (ws) ws.close();   // close any old connection first
+  // Graph buttons: switch what's plotted and redraw
+  document.querySelectorAll('#tabs button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      graphKey = btn.dataset.key;
+      document.querySelectorAll('#tabs button').forEach((b) => b.classList.toggle('active', b === btn));
+      drawChart();
+    });
+  });
 
-    // ws:// is basically http:// but the connection stays open, so the
-    // ESP32 can keep pushing readings instead of us polling for one.
+  // Connects to the ESP32 that served this page
+  function connect() {
+    if (ws) ws.close();   // Close any old connection
+
+    // WebSocket stays open so the ESP32 can push each reading to us
     ws = new WebSocket('ws://' + location.host + '/ws');
 
-    // event handlers the browser calls automatically - we never call these ourselves
     ws.onopen = () => setStatus(false, 'Waiting for device…');
     ws.onclose = () => {
       setStatus(false, 'Reconnecting…');
-      setTimeout(connect, 2000);   // keep retrying
+      setTimeout(connect, 2000);   // Keep retrying
     };
     ws.onerror = () => setStatus(false, 'Connection error');
     ws.onmessage = (evt) => {
-      // Every message is a small JSON blob
-      // Example: {"v":13.81,"i":654,"p":5.54,"ph":27.73,"t":123456,"c":1}
-      // "ph" is the phase difference between voltage and current, in degrees.
-      // "c" is 1 if the ATmega's UART is actively sending, 0 if it's
-      // gone quiet - the only source of truth for the status dot. Sent
-      // on both new readings and a periodic heartbeat, so a dead link
-      // still gets noticed even with no fresh data.
+      // Example message: {"v":13.81,"i":654,"p":5.54,"ph":27.73,"t":123456,"c":1}
+      // The "c" field is 1 if the ATmega is sending, also sent every 1 s as a heartbeat
       try {
         const d = JSON.parse(evt.data);
         const live = !!d.c;
@@ -213,35 +235,35 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
         if (live && d.t !== lastT) {
           if (lastT !== null && d.t < lastT) history.length = 0;   // ESP32 restarted, start fresh
           lastT = d.t;
-          updateReading(d.v, d.i, d.p, d.ph, d.t);
+          updateReading(d);
         }
       } catch (e) {
-        // Malformed/cut-off message - just ignore it, another one's coming soon.
+        // Broken message, ignore it, another one is coming
       }
     };
   }
 
-  // ---- pushes a new reading onto the page ----
-  // Called once per new ATmega frame (2 per second).
-  function updateReading(v, i, p, ph, t) {
-    // innerHTML (not textContent) since we need the <span class="unit"> back each time.
+  // Shows a new reading, runs once per ATmega frame (2 per second)
+  function updateReading(d) {
     // V, power and phase to 2dp, current in whole mA
-    // Phase shows 0 if the ATmega didn't send one
-    vVal.innerHTML = v.toFixed(2) + '<span class="unit">V</span>';
-    iVal.innerHTML = Math.round(i) + '<span class="unit">mA</span>';
-    pVal.innerHTML = p.toFixed(2) + '<span class="unit">W</span>';
-    phVal.innerHTML = (ph || 0).toFixed(2) + '<span class="unit">&deg;</span>';
+    vVal.innerHTML = d.v.toFixed(2) + '<span class="unit">V</span>';
+    iVal.innerHTML = Math.round(d.i) + '<span class="unit">mA</span>';
+    pVal.innerHTML = d.p.toFixed(2) + '<span class="unit">W</span>';
+    phVal.innerHTML = (d.ph || 0).toFixed(2) + '<span class="unit">&deg;</span>';
 
-    history.unshift({ t: t, p: p });   // Newest goes at the front, drawn on the left
-    // Drop points that have scrolled off the right edge
-    while (history.length && t - history[history.length - 1].t > WINDOW_MS) history.pop();
+    // Save all 4 values so the graph can switch without losing history
+    history.unshift({ t: d.t, v: d.v, i: d.i, p: d.p, ph: d.ph || 0 });   // Newest at the front
+    // Drop points older than 60 s
+    while (history.length && d.t - history[history.length - 1].t > WINDOW_MS) history.pop();
     drawChart();
   }
 
-  // ---- draws the power-vs-time graph ----
-  // Newest reading on the left, older ones move right. X is real time from the ESP32 timestamps.
+  // Draws the graph, newest on the left, x axis is real time from the ESP32 timestamps
   function drawChart() {
-    // Match the canvas to its size on screen so text and lines stay sharp
+    const g = GRAPHS[graphKey];
+    graphTitle.textContent = g.name + ' (' + g.unit + '), last 60 s';
+
+    // Match the canvas to its size on screen so it stays sharp
     const dpr = window.devicePixelRatio || 1;
     const w = canvas.clientWidth, h = canvas.clientHeight;
     if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
@@ -251,31 +273,31 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.clearRect(0, 0, w, h);
 
-    // Plot area, leaving room for the axis labels
+    // Plot area with room for the labels
     const padL = 36, padR = 10, padT = 8, padB = 22;
     const plotW = w - padL - padR, plotH = h - padT - padB;
     const xOf = (agoMs) => padL + (agoMs / WINDOW_MS) * plotW;
-    const yOf = (watts) => padT + plotH - (Math.min(Math.max(watts, 0), MAX_POWER_W) / MAX_POWER_W) * plotH;
+    const yOf = (val) => padT + plotH - (Math.min(Math.max(val, 0), g.max) / g.max) * plotH;
 
     ctx.font = '11px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif';
-    ctx.fillStyle = '#767676';
+    ctx.fillStyle = '#9a9a9a';
     ctx.lineWidth = 1;
 
-    // Y axis: gridline and label every 2 W
+    // Y axis gridlines, very faint so they don't stand out
     ctx.textAlign = 'right';
     ctx.textBaseline = 'middle';
-    for (let watts = 0; watts <= MAX_POWER_W; watts += Y_STEP_W) {
-      const y = Math.round(yOf(watts)) + 0.5;   // +0.5 keeps 1 px lines crisp
-      ctx.strokeStyle = watts === 0 ? '#c8c8c8' : '#eeeeee';
+    for (let val = 0; val <= g.max; val += g.step) {
+      const y = Math.round(yOf(val)) + 0.5;   // Adding 0.5 keeps 1 px lines sharp
+      ctx.strokeStyle = val === 0 ? 'rgba(0, 0, 0, 0.15)' : 'rgba(0, 0, 0, 0.05)';
       ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w - padR, y); ctx.stroke();
-      ctx.fillText(watts === MAX_POWER_W ? watts + ' W' : String(watts), padL - 6, y);
+      ctx.fillText(String(val), padL - 6, y);
     }
 
-    // X axis: gridline every 10 s, "now" on the left
+    // X axis gridline every 10 s, "now" on the left
     ctx.textBaseline = 'top';
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.05)';
     for (let ago = 0; ago <= WINDOW_MS; ago += X_STEP_MS) {
       const x = Math.round(xOf(ago)) + 0.5;
-      ctx.strokeStyle = '#eeeeee';
       ctx.beginPath(); ctx.moveTo(x, padT); ctx.lineTo(x, padT + plotH); ctx.stroke();
       ctx.textAlign = ago === 0 ? 'left' : (ago === WINDOW_MS ? 'right' : 'center');
       ctx.fillText(ago === 0 ? 'now' : '-' + ago / 1000 + 's', x, padT + plotH + 6);
@@ -283,14 +305,14 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
 
     if (history.length === 0) return;
 
-    // The power line, from the newest point (left) to the oldest (right)
+    // The line, from the newest point (left) to the oldest (right)
     const newest = history[0].t;
     ctx.strokeStyle = '#2f6fed';
     ctx.lineWidth = 2;
     ctx.lineJoin = 'round';
     ctx.beginPath();
     history.forEach((pt, idx) => {
-      const x = xOf(newest - pt.t), y = yOf(pt.p);
+      const x = xOf(newest - pt.t), y = yOf(pt[graphKey]);
       const gap = idx > 0 && history[idx - 1].t - pt.t > GAP_MS;   // Don't join across missing frames
       if (idx === 0 || gap) ctx.moveTo(x, y); else ctx.lineTo(x, y);
     });
@@ -298,12 +320,12 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
 
     // Dot on the newest reading
     ctx.fillStyle = '#2f6fed';
-    ctx.beginPath(); ctx.arc(xOf(0), yOf(history[0].p), 3, 0, 2 * Math.PI); ctx.fill();
+    ctx.beginPath(); ctx.arc(xOf(0), yOf(history[0][graphKey]), 3, 0, 2 * Math.PI); ctx.fill();
   }
 
-  window.addEventListener('resize', drawChart);   // Redraw sharp if the window size changes
+  window.addEventListener('resize', drawChart);   // Redraw if the window size changes
   drawChart();   // Draw the empty axes straight away
-  connect();   // nothing to enter, no button to press - go straight to live data
+  connect();     // Go straight to live data
 </script>
 </body>
 </html>

@@ -1,43 +1,27 @@
 #pragma once
 #include <IPAddress.h>
 
-// All the settings/constants for the project live here so we don't have
-// magic numbers scattered everywhere.
+// All the settings in one place so there's no magic numbers in the other files
 namespace Config {
 
-  // ESP32 makes its own WiFi network (access point) instead of joining
-  // the uni/home WiFi, so it works the same no matter where we demo it.
+  // ESP32 makes its own WiFi network, so it works the same wherever we demo it
+  // No password so a phone can join straight away
   constexpr const char* AP_SSID = "Team15_EnergyMonitor";
 
-  // No password = open network, so a phone can just join without typing
-  // anything. If we want one later: WiFi.softAP(Config::AP_SSID, "pw") in main.cpp
-  // (see startAccessPoint()).
-
-  // IP/gateway we give the AP (set in startAccessPoint() in main.cpp).
-  // Deliberately NOT a normal 192.168.x.x address - Samsung phones
-  // check the gateway IP as part of deciding whether to show the
-  // "Sign in to network" popup, and if it looks like a typical home
-  // router range they assume it's a known network with a temporary
-  // internet outage and never bother asking. Giving it a public-looking
-  // address (this one's unused/reserved, so it won't clash with
-  // anything) makes Samsung treat it like a proper hotspot and pop the
-  // captive portal prompt like every other phone already does.
+  // Not 192.168.x.x on purpose, Samsung phones don't show the sign-in popup for that range
   const IPAddress AP_LOCAL_IP(4, 3, 2, 1);
   const IPAddress AP_GATEWAY_IP(4, 3, 2, 1);
   const IPAddress AP_SUBNET(255, 255, 255, 0);
 
-  // Backup way to reach the dashboard if the IP isn't handy.
-  // Doesn't work on every OS, so the IP is the reliable fallback.
+  // Lets some devices use energymonitor.local instead of the IP
   constexpr const char* MDNS_NAME = "energymonitor";
 
-  // --- UART link to the ATmega328P ---
-  // Baud has to match whatever the ATmega's USART is set to.
+  // UART link to the ATmega, baud has to match the ATmega
   constexpr unsigned long ATMEGA_BAUD = 9600;
-  constexpr int ATMEGA_RX_PIN = 16;   // ESP RX2 <- ATmega TXD (through voltage divider, 5V->3.3V)
-  constexpr int ATMEGA_TX_PIN = -1; // 17;   // ESP TX2 -> ATmega RXD (we don't actually send anything back)
+  constexpr int ATMEGA_RX_PIN = 16;   // ESP RX <- ATmega TX (through the 5V -> 3.3V divider)
+  constexpr int ATMEGA_TX_PIN = -1;   // Not used, we never send anything back (GPIO17 if we ever do)
 
-  // How long without a frame before we decide the ATmega has dropped off
-  // Used by UartBridge::isConnected() for the status dot and the USB printing
+  // No frame for this long = ATmega has dropped off (status dot and USB printing)
   // ATmega sends every 0.5 s, so 2.5 s is plenty of slack
   constexpr unsigned long ATMEGA_TIMEOUT_MS = 2500;
 

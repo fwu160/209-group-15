@@ -1,52 +1,49 @@
 #include "UartBridge.h"
 
-// Opens the serial port at the given baud/pins so we're ready to receive.
+// Opens the serial port so we're ready to receive
 void UartBridge::begin(HardwareSerial& serial, unsigned long baud, int rxPin, int txPin) {
   serial_ = &serial;
   serial_->begin(baud, SERIAL_8N1, rxPin, txPin);
 }
 
-// Reads whatever's in the UART buffer, one character at a time, and
-// builds up a line until we hit '\n'.
+// Builds up a line one character at a time until '\n'
 void UartBridge::poll() {
-  if (!serial_) return;   // begin() hasn't been called, nothing to do
+  if (!serial_) return;   // Not started yet (no begin())
 
   while (serial_->available()) {
     char c = serial_->read();
     if (c == '\n') {
-      // Got a full line - clean it up and hand it off.
+      // Full line, tidy it up and parse it
       buffer_.trim();
       if (buffer_.length() > 0) handleLine(buffer_);
-      buffer_ = "";   // reset for the next line
+      buffer_ = "";
     } else if (c != '\r') {
       buffer_ += c;
-      if (buffer_.length() > 96) buffer_ = "";  // line's gone way too long, bin it and start again
+      if (buffer_.length() > 96) buffer_ = "";  // Way too long, must be junk so start again
     }
   }
 }
 
-// Expects "voltage,current,power,phase" as a CSV line. Update this if the
-// ATmega ever changes what it sends.
+// Expects "voltage,current,power,phase", change this if the ATmega frame changes
 void UartBridge::handleLine(const String& line) {
-  // Find the commas so we can slice the string into 4 fields.
+  // Find the commas to split the 4 fields
   int c1 = line.indexOf(',');
   int c2 = line.indexOf(',', c1 + 1);
-  if (c1 < 0 || c2 < 0) return;  // malformed frame, just drop it
-  int c3 = line.indexOf(',', c2 + 1);   // -1 if there's no 4th (phase) field
+  if (c1 < 0 || c2 < 0) return;  // Bad frame, drop it
+  int c3 = line.indexOf(',', c2 + 1);   // Gives -1 if there's no phase field
 
   last_.voltage = line.substring(0, c1).toFloat();
   last_.current = line.substring(c1 + 1, c2).toFloat();
   if (c3 < 0) {
-    // Old 3-field frame with no phase on the end (e.g. the UART test
-    // firmware) - still accept it, phase just shows as 0.
+    // Old 3 field frame without phase, still accept it
     last_.power = line.substring(c2 + 1).toFloat();
     last_.phase = 0;
   } else {
     last_.power = line.substring(c2 + 1, c3).toFloat();
     last_.phase = line.substring(c3 + 1).toFloat();
   }
-  last_.millisAtFrame = millis();   // stamp it so isConnected()/timeout logic works
+  last_.millisAtFrame = millis();   // Used for the connected timeout
 
-  // Tell whoever's listening (main.cpp) that a new reading is ready.
+  // Let main.cpp know there's a new reading
   if (callback_) callback_(last_);
 }

@@ -1,12 +1,11 @@
 /*
- * ESP32 wireless bridge - ELECTENG 209 Smart Energy Challenge
- * Gets readings from the ATmega328P over UART, sends them out over
- * WiFi (to the dashboard website) and USB.
+ * ESP32 wireless bridge - ELECTENG 209 Smart Energy Monitor
+ * Gets readings from the ATmega over UART and sends them to the dashboard (WiFi) and USB
  */
 
 #include <Arduino.h>
 #include <WiFi.h>
-#include <esp_wifi.h>   // needed for the AMPDU RX workaround below
+#include <esp_wifi.h>   // For the AMPDU fix in startAccessPoint()
 #include "Config.h"
 #include "UartBridge.h"
 #include "TelemetryServer.h"
@@ -14,52 +13,42 @@
 UartBridge uartBridge;
 TelemetryServer telemetryServer;
 
-// Prints a reading out the USB serial port, formatted the way the spec wants.
+// Prints one reading over USB in the format the spec wants
 void printReadingOverUsb(const Reading& r) {
   Serial.printf("RMS Voltage is: %.1f\r\n", r.voltage);
   Serial.printf("Peak Current is: %.0f\r\n", r.current);
   Serial.printf("Power is: %.2f\r\n", r.power);
-  Serial.println(); // blank line before the next block
+  Serial.println(); // Blank line between blocks
 }
 
-// Runs whenever uartBridge finishes parsing a new frame from the ATmega.
-// Sends it straight to the dashboard (every 0.5 s)
-// USB printing happens once a second in loop() instead
+// Runs for each new ATmega frame (every 0.5 s), sends it to the dashboard
+// USB printing is done once a second in loop() instead
 void onNewReading(const Reading& r) {
   telemetryServer.broadcast(r);
 }
 
-// True if the ATmega's sent a frame recently, i.e. it's actually alive
-// and talking, not just idling. Drives the dashboard's status dot.
+// True if the ATmega has sent a frame recently
 bool isAtmegaConnected() {
   return uartBridge.isConnected(Config::ATMEGA_TIMEOUT_MS);
 }
 
-// Starts the ESP32's own WiFi access point (open, no password) so a
-// phone can join straight from the "Sign in to network" prompt.
+// Starts the ESP32's own open WiFi network
 void startAccessPoint() {
-  WiFi.mode(WIFI_AP);   // ESP32 hosts its own network
+  WiFi.mode(WIFI_AP);
 
-  // Give the AP the public-looking IP from Config instead of the usual
-  // 192.168.4.1 - see the comment on Config::AP_LOCAL_IP for why (fixes
-  // the captive portal popup not showing up on Samsung phones). Has to
-  // be set before softAP() actually starts broadcasting.
+  // IP has to be set before softAP() starts (see Config.h for why it's 4.3.2.1)
   WiFi.softAPConfig(Config::AP_LOCAL_IP, Config::AP_GATEWAY_IP, Config::AP_SUBNET);
-  WiFi.softAP(Config::AP_SSID);    // no password arg = open network
+  WiFi.softAP(Config::AP_SSID);    // No password = open network
 
-  // Known ESP32 WiFi driver bug: AMPDU frame aggregation on the RX side
-  // trips up some Android phones and causes them to silently drop or
-  // never fully complete the connection to the AP. Restarting the WiFi
-  // driver with it turned off fixes it - the AP config we just set
-  // above stays intact through the restart. Costs us a bit of WiFi
-  // throughput we don't need anyway.
+  // ESP32 WiFi bug: AMPDU RX makes some Android phones fail to connect
+  // Restart the driver with it off, the AP settings above are kept
   esp_wifi_stop();
   esp_wifi_deinit();
   wifi_init_config_t wifiConfig = WIFI_INIT_CONFIG_DEFAULT();
   wifiConfig.ampdu_rx_enable = false;
   esp_wifi_init(&wifiConfig);
   esp_wifi_start();
-  delay(100);   // give the WiFi driver a moment to settle before we start using it
+  delay(100);   // Let the driver settle
 
   Serial.println("Access point started.");
   Serial.print("  SSID: ");
@@ -71,23 +60,21 @@ void startAccessPoint() {
 void setup() {
   Serial.begin(9600);   // USB output at 9600 baud
 
-  // UART needs to be ready before the AP goes up, so we don't miss the
-  // ATmega's first frames.
+  // Start UART before WiFi so we don't miss the first frames
   uartBridge.begin(Serial2, Config::ATMEGA_BAUD, Config::ATMEGA_RX_PIN, Config::ATMEGA_TX_PIN);
   uartBridge.onReading(onNewReading);
 
   startAccessPoint();
 
-  // Hook the server up to the UART bridge so it can answer /status and
-  // report the real connection state.
+  // Give the server the latest reading and the link status
   telemetryServer.setLastReadingProvider(&uartBridge.lastReading());
   telemetryServer.setConnectedProvider(isAtmegaConnected);
   telemetryServer.begin(Config::MDNS_NAME);
 }
 
 void loop() {
-  uartBridge.poll();      // check for new UART data from the ATmega
-  telemetryServer.loop(); // WebSocket/DNS housekeeping + heartbeat
+  uartBridge.poll();      // Check for new UART data
+  telemetryServer.loop(); // WebSocket/DNS housekeeping and heartbeat
 
   // Print the latest reading over USB once a second
   // Only while the ATmega is sending, stops 2.5 s after the frames stop
@@ -98,5 +85,4 @@ void loop() {
       printReadingOverUsb(uartBridge.lastReading());
     }
   }
-  
 }
