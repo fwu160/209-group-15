@@ -1,6 +1,6 @@
 LTspice 26.0.1 for Windows
-Circuit: C:\Users\dsha295\OneDrive - The University of Auckland\Desktop\209-group-15\LTspice\Front end sim.net
-Start Time: Thu Sep 17 16:59:17 2026
+Circuit: C:\Users\fwu160\OneDrive - The University of Auckland\Documents\GitHub\209-group-15\LTspice\Front end sim.net
+Start Time: Thu Oct 15 13:37:14 2026
 solver = Normal
 Maximum thread count: 24
 tnom = 27
@@ -11,11 +11,11 @@ Direct Newton iteration failed to find operating point.
 Starting Gmin stepping
 Gmin stepping succeeded in finding the operating point.
 
-Total elapsed time: 4.020 seconds.
+Total elapsed time: 1.113 seconds.
 
 Files loaded:
-C:\Users\dsha295\OneDrive - The University of Auckland\Desktop\209-group-15\LTspice\Front end sim.net
-C:\Users\dsha295\AppData\Local\LTspice\lib\cmp\standard.dio
-C:\Users\dsha295\OneDrive - The University of Auckland\Desktop\209-group-15\LTspice\LM324.lib
-C:\Users\dsha295\AppData\Local\LTspice\lib\sub\LT1083.lib
+C:\Users\fwu160\OneDrive - The University of Auckland\Documents\GitHub\209-group-15\LTspice\Front end sim.net
+C:\Users\fwu160\AppData\Local\LTspice\lib\cmp\standard.dio
+C:\Users\fwu160\OneDrive - The University of Auckland\Documents\GitHub\209-group-15\LTspice\LM324.lib
+C:\Users\fwu160\AppData\Local\LTspice\lib\sub\LT1083.lib
 
