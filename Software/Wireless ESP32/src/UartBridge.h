@@ -7,13 +7,14 @@ struct Reading {
   float current = 0;                 // Peak current in mA
   float power = 0;                   // Real power in W
   float phase = 0;                   // Phase between V and I in degrees
+  float energy = 0;                  // Energy since ATmega power-up in J
   unsigned long millisAtFrame = 0;   // Time the frame arrived, from millis()
 };
 
 // Function type that gets called with each new reading
 using ReadingCallback = void (*)(const Reading&);
 
-// Reads lines like "13.81,654,5.54,27.73" from the ATmega and turns them into Readings
+// Reads lines like "13.81,654,5.54,27.73,1234.5" from the ATmega and turns them into Readings
 // Doesn't block, just call poll() every loop()
 class UartBridge {
 public:

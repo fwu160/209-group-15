@@ -18,6 +18,7 @@ void printReadingOverUsb(const Reading& r) {
   Serial.printf("RMS Voltage is: %.1f\r\n", r.voltage);
   Serial.printf("Peak Current is: %.0f\r\n", r.current);
   Serial.printf("Power is: %.2f\r\n", r.power);
+  Serial.printf("Energy is: %.1f\r\n", r.energy);
   Serial.println(); // Blank line between blocks
 }
 

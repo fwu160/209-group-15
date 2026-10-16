@@ -75,6 +75,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     border-radius: 8px;
     padding: 18px;
   }
+  .meter.wide { grid-column: 1 / -1; }   /* Energy card spans the whole row */
   .meter .label { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
   .meter .value { font-size: 30px; font-weight: 600; }
   .meter .unit { font-size: 14px; color: var(--accent); margin-left: 4px; font-weight: 500; }
@@ -147,6 +148,10 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
       <div class="label">Phase difference</div>
       <div class="value" id="phVal">--<span class="unit">&deg;</span></div>
     </div>
+    <div class="meter wide">
+      <div class="label">Energy since power-up</div>
+      <div class="value" id="eVal">--<span class="unit">J</span></div>
+    </div>
   </div>
 
   <div class="graph">
@@ -171,6 +176,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
   const iVal = document.getElementById('iVal');
   const pVal = document.getElementById('pVal');
   const phVal = document.getElementById('phVal');
+  const eVal = document.getElementById('eVal');
   const metersEl = document.getElementById('meters');
   const statusDot = document.getElementById('statusDot');
   const statusText = document.getElementById('statusText');
@@ -225,7 +231,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     };
     ws.onerror = () => setStatus(false, 'Connection error');
     ws.onmessage = (evt) => {
-      // Example message: {"v":13.81,"i":654,"p":5.54,"ph":27.73,"t":123456,"c":1}
+      // Example message: {"v":13.81,"i":654,"p":5.54,"ph":27.73,"e":1234.5,"t":123456,"c":1}
       // The "c" field is 1 if the ATmega is sending, also sent every 1 s as a heartbeat
       try {
         const d = JSON.parse(evt.data);
@@ -250,6 +256,7 @@ const char DASHBOARD_HTML[] PROGMEM = R"rawliteral(
     iVal.innerHTML = Math.round(d.i) + '<span class="unit">mA</span>';
     pVal.innerHTML = d.p.toFixed(2) + '<span class="unit">W</span>';
     phVal.innerHTML = (d.ph || 0).toFixed(2) + '<span class="unit">&deg;</span>';
+    eVal.innerHTML = (d.e || 0).toFixed(1) + '<span class="unit">J</span>';
 
     // Save all 4 values so the graph can switch without losing history
     history.unshift({ t: d.t, v: d.v, i: d.i, p: d.p, ph: d.ph || 0 });   // Newest at the front

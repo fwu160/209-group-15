@@ -24,13 +24,14 @@ void UartBridge::poll() {
   }
 }
 
-// Expects "voltage,current,power,phase", change this if the ATmega frame changes
+// Expects "voltage,current,power,phase,energy", change this if the ATmega frame changes
 void UartBridge::handleLine(const String& line) {
-  // Find the commas to split the 4 fields
+  // Find the commas to split the 5 fields
   int c1 = line.indexOf(',');
   int c2 = line.indexOf(',', c1 + 1);
   if (c1 < 0 || c2 < 0) return;  // Bad frame, drop it
   int c3 = line.indexOf(',', c2 + 1);   // Gives -1 if there's no phase field
+  int c4 = (c3 < 0) ? -1 : line.indexOf(',', c3 + 1);   // Gives -1 if there's no energy field
 
   last_.voltage = line.substring(0, c1).toFloat();
   last_.current = line.substring(c1 + 1, c2).toFloat();
@@ -38,9 +39,16 @@ void UartBridge::handleLine(const String& line) {
     // Old 3 field frame without phase, still accept it
     last_.power = line.substring(c2 + 1).toFloat();
     last_.phase = 0;
-  } else {
+    last_.energy = 0;
+  } else if (c4 < 0) {
+    // Four field frame without energy
     last_.power = line.substring(c2 + 1, c3).toFloat();
     last_.phase = line.substring(c3 + 1).toFloat();
+    last_.energy = 0;
+  } else {
+    last_.power = line.substring(c2 + 1, c3).toFloat();
+    last_.phase = line.substring(c3 + 1, c4).toFloat();
+    last_.energy = line.substring(c4 + 1).toFloat();
   }
   last_.millisAtFrame = millis();   // Used for the connected timeout
 

@@ -4,13 +4,13 @@
 #include "Dashboardpage.h"
 
 // Turns a Reading into the JSON the dashboard reads
-// Example: {"v":13.81,"i":654,"p":5.54,"ph":27.73,"t":123456,"c":1}
+// Example: {"v":13.81,"i":654,"p":5.54,"ph":27.73,"e":1234.5,"t":123456,"c":1}
 // The "t" field is when the frame arrived, "c" is 1 if the ATmega is sending
 String TelemetryServer::toJson(const Reading& r, bool connected) {
   char json[144];
   snprintf(json, sizeof(json),
-    "{\"v\":%.2f,\"i\":%.0f,\"p\":%.2f,\"ph\":%.2f,\"t\":%lu,\"c\":%d}",
-    r.voltage, r.current, r.power, r.phase, r.millisAtFrame, connected ? 1 : 0);
+    "{\"v\":%.2f,\"i\":%.0f,\"p\":%.2f,\"ph\":%.2f,\"e\":%.1f,\"t\":%lu,\"c\":%d}",
+    r.voltage, r.current, r.power, r.phase, r.energy, r.millisAtFrame, connected ? 1 : 0);
   return String(json);
 }
 
@@ -60,8 +60,8 @@ void TelemetryServer::begin(const char* mdnsName) {
     }
     char json[192];
     snprintf(json, sizeof(json),
-      "{\"v\":%.2f,\"i\":%.0f,\"p\":%.2f,\"ph\":%.2f,\"ageMs\":%lu,\"connected\":%d}",
-      last_->voltage, last_->current, last_->power, last_->phase, millis() - last_->millisAtFrame, connected ? 1 : 0);
+      "{\"v\":%.2f,\"i\":%.0f,\"p\":%.2f,\"ph\":%.2f,\"e\":%.1f,\"ageMs\":%lu,\"connected\":%d}",
+      last_->voltage, last_->current, last_->power, last_->phase, last_->energy, millis() - last_->millisAtFrame, connected ? 1 : 0);
     request->send(200, "application/json", json);
   });
 
