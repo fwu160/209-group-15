@@ -73,7 +73,7 @@ uint16_t whole_cycle_samples(const uint16_t *v_buf)
 	}
 	return n;
 }
-void power_calc_run(const uint16_t *v_buf, const uint16_t *i_buf, reading_t *result){
+void reading_calc_run(const uint16_t *v_buf, const uint16_t *i_buf, reading_t *result){
 		
 		uint16_t n = whole_cycle_samples(v_buf);
 
@@ -172,7 +172,7 @@ static float phase_from_power(float power, float vrms, float irms)
 	return acosf(power_factor) * 57.29578f;	
 }
 
-void power_avg_reset(reading_sums_t *avg)
+void reading_avg_reset(reading_sums_t *avg)
 {
 	avg->vrms_sum     = 0.0f;
 	avg->irms_sum     = 0.0f;
@@ -182,7 +182,7 @@ void power_avg_reset(reading_sums_t *avg)
 	avg->clipped      = 0;
 }
 
-void power_avg_add(reading_sums_t *avg, const reading_t *one)
+void reading_avg_add(reading_sums_t *avg, const reading_t *one)
 {
 	avg->vrms_sum     += one->vrms;
 	avg->irms_sum     += one->irms;
@@ -194,7 +194,7 @@ void power_avg_add(reading_sums_t *avg, const reading_t *one)
 	}
 }
 
-void power_avg_get(const reading_sums_t *avg, reading_t *result)
+void reading_avg_get(const reading_sums_t *avg, reading_t *result)
 {
 	float n = (float)avg->count;
 

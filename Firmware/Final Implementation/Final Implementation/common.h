@@ -64,6 +64,9 @@ UART frame about 25 ms, therefore 5 ticks = 0.5 s -> about 5-6 captures averaged
 #define TIMER2_TOP			194		// OCR2A value: 195 counts x 512 us = 99.84 ms
 #define TICKS_PER_REPORT    5    
 
+// Time one report covers: 5 x 195 x 1024 / 2 MHz = 0.4992 s
+#define REPORT_PERIOD  ((float)TICKS_PER_REPORT * (TIMER2_TOP + 1) * 1024 / F_CPU)
+
 
 /* Display */ 
 #define TIMER0_TOP	79	// Display timer TOP, 80 counts x 32 us = 2.56 ms per digit
