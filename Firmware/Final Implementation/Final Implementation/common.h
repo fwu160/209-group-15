@@ -41,15 +41,31 @@ when to give up on measurement )
 #define ZC_TIMEOUT_LOOPS 20000U
  
  
-/* Calibration */ 
-#define K_V   0.109922f		// Source volts per ADC count
-#define K_I   0.004037f		// Load amps per ADC count
+/* Calibration */
+/* Converts ADC counts back into real volts & amps, and lines up 
+the samples in real time. Finetuned with the scope and multimeter 
+K_new = K_old * (meter reading / displayed reading) */
 
-// V burst starts this many cycles early to cancel I lag
-// About 11.1 cycles/deg on the V burst 
-#define PHASE_TRIM_CYCLES   23
+/* K_V is the source volts per ADC count (Vrms = RMS counts * K_V)
+ The divider (56k/2.7k) + level-shift op-amp shrink the source
+ about (1/ measured gain)times, so 1 count (5/1024 = 4.88 mV 
+ at the pin) is K_V at source.*/
+#define K_V   0.10942f		    
 
-#define MIN_SAMPLES_APART	10		// Closer crossings are noise (a cycle is ~20 samples)
+/* K_I is the load amps per ADC count (Irms = RMS counts * K_I)
+ 1A through the shunt gives 0.5 V, and the op-amp boosts it
+ to about 1.22V at the pin, so 1 count = about K_I of load current.
+ Additionally, power = mean(Vcounts x Icounts) * K_V * K_I*/
+#define K_I   0.0040104f		
+
+/* the filters delay I slightly more than V, so the V burst 
+ starts [number of phase_trim_cycle] CPU cycles early to line them up
+ and cancel the I lag. About 11.1 cycles/deg on the V burst */
+#define PHASE_TRIM_CYCLES   13 
+
+/* 10 kHz sampling / 500 Hz signal = 20 samples per cycle. Zero crossings
+ closer than half a cycle (10 samples) must be noise, so ignore them. */
+#define MIN_SAMPLES_APART	10	
 
 
 // UART send rate
