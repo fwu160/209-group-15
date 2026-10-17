@@ -133,7 +133,7 @@ int main(void)
 			}
 			
 			if (latest.power >0){
-				energy = latest.power * REPORT_PERIOD;
+				energy += latest.power * REPORT_PERIOD;
 			}
 			send_results(&latest, energy);
 			
