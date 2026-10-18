@@ -61,11 +61,11 @@ theory. Calibrated against the scope to 0.1094 (AVCC slightly under 5 V + resist
 /* 
 K_I: load amps per ADC count (Irms = RMS counts x K_I, Ipeak = peak counts x K_I).
 Analog gain from the load current to the ADC0 pin:
-shunt R3 || R4          0.495 ohm (measured)             = 0.495 V per A
+shunt R3 || R4          0.504 ohm (measured)             = 0.504 V per A
 diff amp U3A            (R16 + R17) / R18 = 28.5k / 12k  = 2.375
 filters C6/C8, R19/C7   at 500 Hz                        = 0.998
-total ~ 1.17 V per load amp
-K_I = 4.88 mV / 1.17 = 0.0042 in theory. Calibrated against a DMM in series with the load
+total  ~ 1.19 V per load amp
+K_I = 4.88 mV / 1.19 = 0.0041 in theory. Calibrated against a DMM in series with the load
 Power = mean(v counts x i counts) x K_V x K_I. 
 */
 #define K_I   0.0040104f		
