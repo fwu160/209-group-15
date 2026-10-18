@@ -46,16 +46,28 @@ when to give up on measurement )
 the samples in real time. Finetuned with the scope and multimeter 
 K_new = K_old * (meter reading / displayed reading) */
 
-/* K_V is the source volts per ADC count (Vrms = RMS counts * K_V)
- The divider (56k/2.7k) + level-shift op-amp shrink the source
- about (1/ measured gain)times, so 1 count (5/1024 = 4.88 mV 
- at the pin) is K_V at source.*/
+/* 
+K_V: source volts per ADC count (Vrms = RMS of the bias-removed counts x K_V).
+Analog gain from the source to the ADC1 pin:
+divider R2/R1          2.7k / 58.7k         = 0.046
+diff amp U3B           R7/R8 = 10k/10k      = 1 (0.958 actual, its + input sees 2.6k + 5.6k + 2.7k = 10.9k instead of 10k)
+filters C3/C5, R9/C4   at 500 Hz            = 0.999
+total ~ 0.044 V per source volt
+One count is 5 V / 1024 = 4.88 mV at the pin, so K_V = 4.88 mV / 0.044 = 0.111 in
+theory. Calibrated against the scope to 0.1094 (AVCC slightly under 5 V + resistor tolerances)
+*/
 #define K_V   0.10942f		    
 
-/* K_I is the load amps per ADC count (Irms = RMS counts * K_I)
- 1A through the shunt gives 0.5 V, and the op-amp boosts it
- to about 1.22V at the pin, so 1 count = about K_I of load current.
- Additionally, power = mean(Vcounts x Icounts) * K_V * K_I*/
+/* 
+K_I: load amps per ADC count (Irms = RMS counts x K_I, Ipeak = peak counts x K_I).
+Analog gain from the load current to the ADC0 pin:
+shunt R3 || R4          0.495 ohm (measured)             = 0.495 V per A
+diff amp U3A            (R16 + R17) / R18 = 28.5k / 12k  = 2.375
+filters C6/C8, R19/C7   at 500 Hz                        = 0.998
+total ~ 1.17 V per load amp
+K_I = 4.88 mV / 1.17 = 0.0042 in theory. Calibrated against a DMM in series with the load
+Power = mean(v counts x i counts) x K_V x K_I. 
+*/
 #define K_I   0.0040104f		
 
 /* the filters delay I slightly more than V, so the V burst 
