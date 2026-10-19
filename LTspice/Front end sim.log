@@ -1,6 +1,6 @@
 LTspice 26.0.2 for Windows
 Circuit: C:\Users\hiimf\OneDrive\Documents\GitHub\209-group-15\LTspice\Front end sim.net
-Start Time: Sat Oct 17 10:54:37 2026
+Start Time: Tue Oct 20 10:51:17 2026
 solver = Normal
 Maximum thread count: 12
 tnom = 27
@@ -11,7 +11,7 @@ Direct Newton iteration failed to find operating point.
 Starting Gmin stepping
 Gmin stepping succeeded in finding the operating point.
 
-Total elapsed time: 0.242 seconds.
+Total elapsed time: 9.805 seconds.
 
 Files loaded:
 C:\Users\hiimf\OneDrive\Documents\GitHub\209-group-15\LTspice\Front end sim.net
