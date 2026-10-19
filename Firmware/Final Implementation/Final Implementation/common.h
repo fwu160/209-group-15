@@ -73,7 +73,7 @@ Power = mean(v counts x i counts) x K_V x K_I.
 /* the filters delay I slightly more than V, so the V burst 
  starts [number of phase_trim_cycle] CPU cycles early to line them up
  and cancel the I lag. About 11.1 cycles/deg on the V burst */
-#define PHASE_TRIM_CYCLES   13 
+#define PHASE_TRIM_CYCLES   18
 
 /* 10 kHz sampling / 500 Hz signal = 20 samples per cycle. Zero crossings
  closer than half a cycle (10 samples) must be noise, so ignore them. */
