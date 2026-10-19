@@ -13,13 +13,15 @@ static volatile uint8_t disp_pos = 0;                       // digit lit next
 
 #define SEG_DP  0b10000000      // Bit 7 is the DP
 
-// Decimals and digits used for each value
-#define VRMS_DECIMALS   2       
-#define VRMS_DIGITS     4
-#define IPEAK_DECIMALS  0       
-#define IPEAK_DIGITS    3
-#define POWER_DECIMALS  2       
-#define POWER_DIGITS    3
+// Decimals for each value, the number always uses the right 3 digits
+#define VRMS_DECIMALS   1       // U13.3
+#define IPEAK_DECIMALS  0       // C282
+#define POWER_DECIMALS  2       // P5.37
+
+// Letters for the leftmost digit (bit 0 = A ... bit 6 = G)
+#define SEG_U  0b00111110       // B C D E F, U for voltage since V can't be drawn
+#define SEG_C  0b00111001       // A D E F
+#define SEG_P  0b01110011       // A B E F G
 
 // segment patterns for 0-9 on 7 seg (bit 7 is decimal point)
 static const uint8_t seg_pattern[10] = {
@@ -73,8 +75,8 @@ void display_set_brightness(uint8_t percent)
 	TCCR0A |= (1 << COM0B1);	// OE pin controlled by pwm 
 }
 
-// Shows a value on the right-most digits with fixed decimals, unused left digits are off, zeros are kept
-static void display_show_fixed(float value, uint8_t decimals, uint8_t digits)
+// Shows a letter on the leftmost digit and the value on the right 3 digits, zeros are kept
+static void display_show_fixed(float value, uint8_t decimals, uint8_t letter)
 {
 	// Scale to a whole number, e.g. 14.48 -> 1448
 	float scale = 1.0f;
@@ -82,12 +84,8 @@ static void display_show_fixed(float value, uint8_t decimals, uint8_t digits)
 		scale *= 10.0f;
 	}
 	
-	// Biggest number that fits, 9999 or 999
-	uint16_t max = 1;
-	for (uint8_t k = 0; k < digits; k++) {
-		max *= 10;
-	}
-	max = max - 1;
+	uint16_t max = 999;		// Biggest number that fits in 3 digits
+
 	
 	// Just in case noise makes value go negative 
 	if (value < 0.0f) {
@@ -104,16 +102,12 @@ static void display_show_fixed(float value, uint8_t decimals, uint8_t digits)
 	}
 	
 	uint8_t d[4];
-	d[0] = seg_pattern[n / 1000];
+	d[0] = letter;	// Leftmost digit shows the letter
 	d[1] = seg_pattern[(n / 100) % 10];
 	d[2] = seg_pattern[(n / 10) % 10];
 	d[3] = seg_pattern[n % 10];
 	
-	// Unused digits on the left get 0 (all segments off)
-	for (uint8_t k = 0; k < 4 - digits; k++) {
-		d[k] = 0;
-	}
-	
+
 	// DP on the units digit, none if decimal is 0
 	if (decimals > 0 && decimals < 4) {
 		d[3 - decimals] |= SEG_DP;
@@ -128,19 +122,16 @@ static void display_show_fixed(float value, uint8_t decimals, uint8_t digits)
 }
 
 
-void display_show_vrms(float volts)
-{
-	display_show_fixed(volts, VRMS_DECIMALS, VRMS_DIGITS);
+void display_show_vrms(float volts) {
+	display_show_fixed(volts, VRMS_DECIMALS, SEG_U);
 }
 
-void display_show_ipeak(float milliamps)
-{
-	display_show_fixed(milliamps, IPEAK_DECIMALS, IPEAK_DIGITS);
+void display_show_ipeak(float milliamps) {
+	display_show_fixed(milliamps, IPEAK_DECIMALS, SEG_C);
 }
 
-void display_show_power(float watts)
-{
-	display_show_fixed(watts, POWER_DECIMALS, POWER_DIGITS);
+void display_show_power(float watts) {
+	display_show_fixed(watts, POWER_DECIMALS, SEG_P);
 }
 
 

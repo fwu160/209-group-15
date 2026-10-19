@@ -32,9 +32,9 @@ void display_init(void);                       // call before sei()
 void display_set_brightness(uint8_t percent);  // 0 = off, 1-100 = dim to full
 
 
-void display_show_vrms(float volts);		// Shows 14.48
-void display_show_ipeak(float milliamps);	// Shows 192, leftmost off
-void display_show_power(float watts);		// Shows 8.38, leftmost off
+void display_show_vrms(float volts);		// Shows U13.3
+void display_show_ipeak(float milliamps);	// Shows C282
+void display_show_power(float watts);		// Shows P5.37
 
 
 #endif /* DISPLAY_H_ */
